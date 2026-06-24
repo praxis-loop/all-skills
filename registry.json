@@ -1,0 +1,26 @@
+[
+  {
+    "id": "clock-in",
+    "name": "Clock In",
+    "path": "clock-in",
+    "entrypoint": "skill.md",
+    "description": "通过 ADB 控制手机打开钉钉，并发送 Bark 通知的自动打卡 skill。",
+    "recommendedTargets": ["claude", "custom"]
+  },
+  {
+    "id": "oazon-daily",
+    "name": "Oazon Daily",
+    "path": "oazon-daily",
+    "entrypoint": "skill.md",
+    "description": "生成和维护 Oazon 每日工作日报，按 8 小时工作内容组织写入 daily.md。",
+    "recommendedTargets": ["claude", "custom"]
+  },
+  {
+    "id": "plain-language-daily-reports",
+    "name": "Plain Language Daily Reports",
+    "path": "plain-language-daily-reports",
+    "entrypoint": "SKILL.md",
+    "description": "把技术工作转成领导可读的日报、周报和项目进展总结。",
+    "recommendedTargets": ["codex", "claude"]
+  }
+]

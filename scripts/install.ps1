@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+$SkillsRoot = Join-Path $RepoRoot "skills"
 
 function Test-SkillEntry {
     param([string]$Path)
@@ -8,9 +9,24 @@ function Test-SkillEntry {
 }
 
 function Get-SkillDirs {
-    Get-ChildItem -Path $RepoRoot -Directory |
-        Where-Object { $_.Name -ne ".git" -and $_.Name -ne "scripts" -and (Test-SkillEntry $_.FullName) } |
-        Sort-Object Name
+    if (-not (Test-Path $SkillsRoot)) {
+        return @()
+    }
+
+    $items = @()
+    foreach ($categoryDir in (Get-ChildItem -Path $SkillsRoot -Directory | Sort-Object Name)) {
+        foreach ($skillDir in (Get-ChildItem -Path $categoryDir.FullName -Directory | Sort-Object Name)) {
+            if (Test-SkillEntry $skillDir.FullName) {
+                $items += [PSCustomObject]@{
+                    Display = "$($categoryDir.Name)/$($skillDir.Name)"
+                    Category = $categoryDir.Name
+                    Name = $skillDir.Name
+                    FullName = $skillDir.FullName
+                }
+            }
+        }
+    }
+    return $items
 }
 
 function Get-TargetDir {
@@ -42,15 +58,15 @@ function Get-TargetDir {
 
 function Install-SkillLink {
     param(
-        [string]$SkillName,
+        [object]$Skill,
         [string]$TargetDir
     )
 
-    $sourceDir = Join-Path $RepoRoot $SkillName
-    $linkPath = Join-Path $TargetDir $SkillName
+    $sourceDir = $Skill.FullName
+    $linkPath = Join-Path $TargetDir $Skill.Name
 
     if (-not (Test-SkillEntry $sourceDir)) {
-        Write-Host "Skip: $SkillName is not a valid skill directory"
+        Write-Host "Skip: $($Skill.Display) is not a valid skill directory"
         return
     }
 
@@ -61,7 +77,7 @@ function Install-SkillLink {
         if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
             Remove-Item $linkPath -Force
         } else {
-            Write-Host "Target exists and is not a symlink, skipped: $linkPath"
+            Write-Host "Target exists and is not a symlink or junction, skipped: $linkPath"
             Write-Host "Move or remove it manually if you want to replace it."
             return
         }
@@ -78,12 +94,12 @@ function Install-SkillLink {
 
 $skills = @(Get-SkillDirs)
 if ($skills.Count -eq 0) {
-    throw "No skill directories found. Each skill needs SKILL.md or skill.md."
+    throw "No skill directories found. Use skills/<category>/<skill-name>/SKILL.md."
 }
 
 Write-Host "Found skills:"
 for ($i = 0; $i -lt $skills.Count; $i++) {
-    Write-Host ("  {0}) {1}" -f ($i + 1), $skills[$i].Name)
+    Write-Host ("  {0}) {1}" -f ($i + 1), $skills[$i].Display)
 }
 Write-Host "  a) Install all"
 
@@ -110,7 +126,7 @@ if ($selection -eq "a" -or $selection -eq "A") {
 Write-Host ""
 Write-Host "Install target: $targetDir"
 foreach ($skill in $selected) {
-    Install-SkillLink -SkillName $skill.Name -TargetDir $targetDir
+    Install-SkillLink -Skill $skill -TargetDir $targetDir
 }
 
 Write-Host ""

@@ -2,18 +2,21 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_ROOT="$REPO_ROOT/skills"
 
 has_skill_entry() {
   [ -f "$1/SKILL.md" ] || [ -f "$1/skill.md" ]
 }
 
-list_skills() {
-  find "$REPO_ROOT" -mindepth 1 -maxdepth 1 -type d \
-    ! -name ".git" ! -name "scripts" \
+list_skill_records() {
+  [ -d "$SKILLS_ROOT" ] || return 0
+  find "$SKILLS_ROOT" -mindepth 2 -maxdepth 2 -type d \
     | sort \
     | while IFS= read -r dir; do
         if has_skill_entry "$dir"; then
-          basename "$dir"
+          category="$(basename "$(dirname "$dir")")"
+          name="$(basename "$dir")"
+          printf '%s|%s|%s|%s\n' "$category/$name" "$dir" "$name" "$category"
         fi
       done
 }
@@ -22,18 +25,16 @@ prompt_target_dir() {
   echo >&2
   echo "请选择安装目标：" >&2
   echo "  1) Codex 用户级: ~/.agents/skills" >&2
-  echo "  2) Codex 机器级: /etc/codex/skills" >&2
-  echo "  3) Claude Code 项目级: ./.claude/skills" >&2
-  echo "  4) Claude Code 用户级: ~/.claude/skills" >&2
-  echo "  5) 自定义目录" >&2
-  read -r -p "输入编号 [1-5]: " target_choice
+  echo "  2) Claude Code 项目级: ./.claude/skills" >&2
+  echo "  3) Claude Code 用户级: ~/.claude/skills" >&2
+  echo "  4) 自定义目录" >&2
+  read -r -p "输入编号 [1-4]: " target_choice
 
   case "${target_choice:-}" in
     1) printf '%s\n' "$HOME/.agents/skills" ;;
-    2) printf '%s\n' "/etc/codex/skills" ;;
-    3) printf '%s\n' "$(pwd)/.claude/skills" ;;
-    4) printf '%s\n' "$HOME/.claude/skills" ;;
-    5)
+    2) printf '%s\n' "$(pwd)/.claude/skills" ;;
+    3) printf '%s\n' "$HOME/.claude/skills" ;;
+    4)
       read -r -p "请输入目标目录绝对路径或相对路径: " custom_dir
       if [ -z "${custom_dir:-}" ]; then
         echo "自定义目录不能为空" >&2
@@ -53,13 +54,14 @@ prompt_target_dir() {
 }
 
 install_link() {
-  local skill_name="$1"
-  local target_dir="$2"
-  local source_dir="$REPO_ROOT/$skill_name"
+  local display="$1"
+  local source_dir="$2"
+  local skill_name="$3"
+  local target_dir="$4"
   local link_path="$target_dir/$skill_name"
 
   if [ ! -d "$source_dir" ] || ! has_skill_entry "$source_dir"; then
-    echo "跳过：$skill_name 不是有效 skill 目录"
+    echo "跳过：$display 不是有效 skill 目录"
     return
   fi
 
@@ -81,16 +83,17 @@ install_link() {
   echo "已安装：$link_path -> $source_dir"
 }
 
-mapfile -t SKILLS < <(list_skills)
+mapfile -t RECORDS < <(list_skill_records)
 
-if [ "${#SKILLS[@]}" -eq 0 ]; then
-  echo "没有发现 skill 目录。每个 skill 目录需要包含 SKILL.md 或 skill.md。" >&2
+if [ "${#RECORDS[@]}" -eq 0 ]; then
+  echo "没有发现 skill 目录。请使用 skills/<category>/<skill-name>/SKILL.md 结构。" >&2
   exit 1
 fi
 
 echo "发现以下 skill："
-for i in "${!SKILLS[@]}"; do
-  printf "  %d) %s\n" "$((i + 1))" "${SKILLS[$i]}"
+for i in "${!RECORDS[@]}"; do
+  IFS='|' read -r display source_dir skill_name category <<< "${RECORDS[$i]}"
+  printf "  %d) %s\n" "$((i + 1))" "$display"
 done
 echo "  a) 全部安装"
 
@@ -100,7 +103,7 @@ TARGET_DIR="$(prompt_target_dir)"
 
 declare -a SELECTED=()
 if [ "$selection" = "a" ] || [ "$selection" = "A" ]; then
-  SELECTED=("${SKILLS[@]}")
+  SELECTED=("${RECORDS[@]}")
 else
   IFS=',' read -ra PARTS <<< "$selection"
   for part in "${PARTS[@]}"; do
@@ -110,18 +113,19 @@ else
       exit 1
     fi
     idx=$((part - 1))
-    if [ "$idx" -lt 0 ] || [ "$idx" -ge "${#SKILLS[@]}" ]; then
+    if [ "$idx" -lt 0 ] || [ "$idx" -ge "${#RECORDS[@]}" ]; then
       echo "选择超出范围：$part" >&2
       exit 1
     fi
-    SELECTED+=("${SKILLS[$idx]}")
+    SELECTED+=("${RECORDS[$idx]}")
   done
 fi
 
 echo
 echo "安装目标：$TARGET_DIR"
-for skill in "${SELECTED[@]}"; do
-  install_link "$skill" "$TARGET_DIR"
+for record in "${SELECTED[@]}"; do
+  IFS='|' read -r display source_dir skill_name category <<< "$record"
+  install_link "$display" "$source_dir" "$skill_name" "$TARGET_DIR"
 done
 
 echo

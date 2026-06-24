@@ -2,18 +2,21 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_ROOT="$REPO_ROOT/skills"
 
 has_skill_entry() {
   [ -f "$1/SKILL.md" ] || [ -f "$1/skill.md" ]
 }
 
-list_skills() {
-  find "$REPO_ROOT" -mindepth 1 -maxdepth 1 -type d \
-    ! -name ".git" ! -name "scripts" \
+list_skill_records() {
+  [ -d "$SKILLS_ROOT" ] || return 0
+  find "$SKILLS_ROOT" -mindepth 2 -maxdepth 2 -type d \
     | sort \
     | while IFS= read -r dir; do
         if has_skill_entry "$dir"; then
-          basename "$dir"
+          category="$(basename "$(dirname "$dir")")"
+          name="$(basename "$dir")"
+          printf '%s|%s|%s|%s\n' "$category/$name" "$dir" "$name" "$category"
         fi
       done
 }
@@ -28,19 +31,19 @@ check_target() {
   fi
 
   local found=0
-  while IFS= read -r skill; do
-    [ -n "$skill" ] || continue
-    local link_path="$target_dir/$skill"
+  while IFS='|' read -r display source_dir skill_name category; do
+    [ -n "$display" ] || continue
+    local link_path="$target_dir/$skill_name"
     if [ -L "$link_path" ]; then
       local resolved
       resolved="$(cd "$(dirname "$link_path")" && readlink "$link_path")"
-      echo "  OK: $skill -> $resolved"
+      echo "  OK: $display installed as $skill_name -> $resolved"
       found=1
     elif [ -e "$link_path" ]; then
-      echo "  WARN: $skill 存在但不是软链接"
+      echo "  WARN: $display installed as $skill_name exists but is not a symlink"
       found=1
     fi
-  done < <(list_skills)
+  done < <(list_skill_records)
 
   if [ "$found" -eq 0 ]; then
     echo "  未发现指向本仓库 skill 的常见安装项"
@@ -52,26 +55,27 @@ echo
 
 echo "发现的 skill："
 count=0
-while IFS= read -r skill; do
-  [ -n "$skill" ] || continue
+last_category=""
+while IFS='|' read -r display source_dir skill_name category; do
+  [ -n "$display" ] || continue
   count=$((count + 1))
+  if [ "$category" != "$last_category" ]; then
+    echo "  [$category]"
+    last_category="$category"
+  fi
   entry=""
-  [ -f "$REPO_ROOT/$skill/SKILL.md" ] && entry="SKILL.md"
-  [ -z "$entry" ] && [ -f "$REPO_ROOT/$skill/skill.md" ] && entry="skill.md"
-  echo "  OK: $skill ($entry)"
-done < <(list_skills)
+  [ -f "$source_dir/SKILL.md" ] && entry="SKILL.md"
+  [ -z "$entry" ] && [ -f "$source_dir/skill.md" ] && entry="skill.md"
+  echo "    OK: $skill_name ($entry)"
+done < <(list_skill_records)
 
 if [ "$count" -eq 0 ]; then
-  echo "  未发现 skill。每个 skill 目录需要包含 SKILL.md 或 skill.md。"
+  echo "  未发现 skill。请使用 skills/<category>/<skill-name>/SKILL.md 结构。"
 fi
 
 check_target "$HOME/.agents/skills"
 check_target "$HOME/.claude/skills"
 check_target "$(pwd)/.claude/skills"
-
-if [ -d "/etc/codex/skills" ]; then
-  check_target "/etc/codex/skills"
-fi
 
 echo
 echo "检查完成。"

@@ -31,7 +31,7 @@
 | `clock-in` | `skills/operations/automation/clock-in` | 日常运营自动化：钉钉打卡和通知 |
 | `oazon-daily` | `skills/content/reports/oazon-daily` | 内容报告：Oazon 每日工作日报 |
 | `plain-language-daily-reports` | `skills/content/reports/plain-language-daily-reports` | 内容报告：大白话日报、周报和项目进展 |
-| `git-change-impact-brief` | `skills/engineering/code-review/git-change-impact-brief` | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
+| `implementation-impact-brief` | `skills/engineering/code-review/implementation-impact-brief` | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
 
 ## 分类规则
 

@@ -1,5 +1,5 @@
 ---
-name: git-change-impact-brief
+name: implementation-impact-brief
 description: Create a technical implementation and impact assessment brief from Git changes, PRs, branches, local diffs, or an AI agent implementation session/transcript. Use when the user asks to summarize what was implemented, explain technical impact, prepare reviewer/tester/release notes, or turn an agent coding session into a structured engineering brief.
 ---
 

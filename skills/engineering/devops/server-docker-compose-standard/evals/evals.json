@@ -1,0 +1,20 @@
+{
+  "skill_name": "server-docker-compose-standard",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "ssh 到我的 Ubuntu VPS，看看现在服务部署太乱了。把能迁移的服务统一到 /opt/docker/<服务名>/docker-compose.yaml，并告诉我哪些端口还暴露在公网。",
+      "expected_output": "Agent performs read-only discovery first, migrates business services under /opt/docker, uses docker-compose.yaml, preserves behavior, verifies containers and ports, and reports risks."
+    },
+    {
+      "id": 2,
+      "prompt": "这台服务器已经按规范整理好了。帮我给下一台服务器也按同样方式部署：所有长期服务走 Docker Compose，别再用 nohup 或 npm start 常驻。",
+      "expected_output": "Agent applies the /opt/docker convention, creates or updates /opt/docker/AGENTS.md, converts naked long-running processes to Compose, and validates with compose config and runtime checks."
+    },
+    {
+      "id": 3,
+      "prompt": "我刚改了一个服务的 docker compose 部署文件，如果仓库能推送就推一下。注意不要把 .env 和 secrets 提交上去。",
+      "expected_output": "Agent checks Git remote/status/diff, stages only relevant deployment files, excludes secrets and runtime files, runs validation, commits and pushes when credentials allow, and clearly reports any permission blocker."
+    }
+  ]
+}

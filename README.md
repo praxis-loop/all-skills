@@ -75,6 +75,7 @@ xan-skills/
 - `skills/content/reports/oazon-daily`
 - `skills/content/reports/plain-language-daily-reports`
 - `skills/engineering/code-review/implementation-impact-brief`
+- `skills/productivity/reading/cangjie-skill`（第三方快照，来源见 `sources/skills.sources.yaml`）
 
 ## 安装目标
 
@@ -111,6 +112,33 @@ powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
 PowerShell 安装脚本会优先尝试创建 SymbolicLink。如果普通用户权限不允许，会回退为目录 Junction。
+
+
+## 第三方 Skill 供应链
+
+本仓库现在区分两类 skill：
+
+- 自有 skill：直接维护在 `skills/<function>/<domain>/<skill-name>`，不需要出现在 source manifest。
+- 第三方 skill：通过 `sources/skills.sources.yaml` 声明来源，通过 `.xan/skills.lock.json` 锁定实际 commit/tree/content hash，然后作为已审核快照进入 `skills/`。
+
+核心规则：不要手工修改第三方快照目录。需要本地适配时，把小改动放到 `overlays/<skill-name>/overlay.yaml`；如果长期大幅修改，改为维护 fork。
+
+常用命令：
+
+```bash
+npm install
+./skillctl check
+./skillctl update cangjie-skill
+./skillctl update --all --dry-run
+./skillctl sync
+./skillctl doctor
+```
+
+已验证的第三方来源示例：
+
+- `cangjie-skill`：来自 `kangarooking/cangjie-skill`，同步到 `skills/productivity/reading/cangjie-skill`。
+
+`.github/workflows/update-skills.yml` 会按计划检查第三方来源，发现变更后创建 PR。PR 会列出 commit、tree SHA、内容 hash 和安全风险标记；默认不直接合并到主分支。
 
 ## 更新已安装 Skill
 
@@ -157,7 +185,7 @@ bash scripts/doctor.sh
 如果有未提交修改：
 
 ```bash
-git add skills docs templates scripts AGENTS.md README.md
+git add skills sources .xan overlays tools test docs templates scripts .github package.json package-lock.json AGENTS.md README.md
 git commit -m "update skills"
 git push
 ```

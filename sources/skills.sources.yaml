@@ -1,0 +1,10 @@
+version: 1
+skills:
+  cangjie-skill:
+    type: github
+    repository: kangarooking/cangjie-skill
+    path: .
+    track:
+      type: branch
+      value: main
+    target: skills/productivity/reading/cangjie-skill

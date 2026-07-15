@@ -40,3 +40,19 @@ Do not overwrite a target CLI skill directory when the existing target is a real
 - Put deterministic helper logic in `scripts/`.
 - Do not commit secrets, tokens, passwords, private keys, or machine-specific local config.
 - Ask for confirmation before deleting data, publishing changes, sending messages, spending money, or changing production systems.
+
+## Third-party Skill Supply Chain
+
+- Keep the filesystem as the source of truth for approved runtime skills. Do not restore `registry.json`.
+- Own skills directly under `skills/`; do not list them in `sources/skills.sources.yaml`.
+- Manage third-party skills through `sources/skills.sources.yaml`, `.xan/skills.lock.json`, and `tools/skillctl`.
+- Do not hand-edit third-party snapshot directories under `skills/`. Use `overlays/<skill-name>/overlay.yaml` for small local adaptations, or fork the upstream source for large changes.
+- After changing sources, lockfiles, overlays, tooling, or third-party snapshots, run:
+
+```bash
+npm test
+./skillctl check
+bash scripts/doctor.sh
+```
+
+- Treat new `allowed-tools` permissions, helper scripts, network commands, package installs, destructive shell commands, and secret-path mentions as review-required changes.

@@ -24,3 +24,11 @@ skills:
       type: branch
       value: main
     target: skills/productivity/feedback/grill-me
+  wrangler:
+    type: github
+    repository: cloudflare/skills
+    path: skills/wrangler
+    track:
+      type: branch
+      value: main
+    target: skills/engineering/cloudflare/wrangler

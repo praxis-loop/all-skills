@@ -55,6 +55,27 @@
       "contentSha256": "sha256:f0816f0f60fa0116f1ef7ccf646df13526cc21bfb46aa8111302a3de2b4b2a0d",
       "syncedAt": "2026-07-15T06:24:07.031Z",
       "riskFlags": []
+    },
+    "wrangler": {
+      "sourceType": "github",
+      "repository": "cloudflare/skills",
+      "path": "skills/wrangler",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "70215303d44a81a0db3219428f4825b604fc6061",
+        "treeSha": "45cc198b2aad3f06e8abf91333f55fbe7579f659"
+      },
+      "target": "skills/engineering/cloudflare/wrangler",
+      "contentSha256": "sha256:fdc8389d19694dbf6b4b9e736d638268d99b99650bc0ce80c468680b554f53f6",
+      "syncedAt": "2026-07-15T14:05:34.925Z",
+      "riskFlags": [
+        "contains network command",
+        "contains package install command",
+        "mentions secret-bearing path"
+      ]
     }
   }
 }

@@ -53,6 +53,28 @@ check_target() {
   fi
 }
 
+check_supply_chain() {
+  echo
+  echo "第三方 Skill 供应链状态："
+
+  if [ ! -f "$REPO_ROOT/package.json" ] || [ ! -x "$REPO_ROOT/tools/skillctl" ]; then
+    echo "  未启用 skillctl，跳过第三方来源/lockfile 检查"
+    return
+  fi
+
+  if command -v npm >/dev/null 2>&1; then
+    set +e
+    (cd "$REPO_ROOT" && npm run skillctl -- check) | sed 's/^/  /'
+    local status=${PIPESTATUS[0]}
+    set -e
+    if [ "$status" -ne 0 ]; then
+      echo "  WARN: skillctl check 发现问题，请先处理来源、lockfile 或 integrity 差异"
+    fi
+  else
+    echo "  WARN: 未找到 npm，无法运行 skillctl check"
+  fi
+}
+
 check_git_sync() {
   echo
   echo "Git 同步状态："
@@ -126,6 +148,7 @@ check_target "$HOME/.agents/skills"
 check_target "$HOME/.claude/skills"
 check_target "$(pwd)/.claude/skills"
 check_git_sync
+check_supply_chain
 
 echo
 echo "检查完成。"

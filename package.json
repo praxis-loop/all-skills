@@ -1,0 +1,17 @@
+{
+  "name": "xan-skills",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Curated AI agent skills repository tooling",
+  "scripts": {
+    "test": "node test/skillctl-lib.test.js",
+    "skillctl": "node tools/skillctl",
+    "update-summary": "node tools/render-update-summary"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=12"
+  }
+}

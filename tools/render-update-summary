@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+const childProcess = require('child_process');
+const lib = require('./skillctl-lib');
+
+const repoRoot = path.resolve(__dirname, '..');
+const lockFile = path.join(repoRoot, '.xan', 'skills.lock.json');
+
+function git(args) {
+  return childProcess.execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  }).trim();
+}
+
+function readLock() {
+  if (!fs.existsSync(lockFile)) return { skills: {} };
+  return JSON.parse(fs.readFileSync(lockFile, 'utf8'));
+}
+
+function changedFiles() {
+  const output = git(['status', '--porcelain']);
+  return lib.parseGitStatusPorcelain(output);
+}
+
+function main() {
+  const lock = readLock();
+  const files = changedFiles();
+  const changedSkillNames = Object.keys(lock.skills || {}).filter((name) => {
+    const target = lock.skills[name].target;
+    return files.some((file) => file === target || file.indexOf(`${target}/`) === 0 || file === '.xan/skills.lock.json');
+  });
+
+  console.log('## Skill Update Summary');
+  console.log('');
+  if (changedSkillNames.length === 0) {
+    console.log('- No external skill lockfile changes were detected.');
+  } else {
+    changedSkillNames.forEach((name) => {
+      const item = lock.skills[name];
+      console.log(`- ${name}`);
+      console.log(`  - Source: ${item.sourceType} ${item.repository || item.package || ''}`.trimEnd());
+      if (item.resolved && item.resolved.commit) {
+        console.log(`  - Commit: ${item.resolved.commit}`);
+      }
+      if (item.resolved && item.resolved.treeSha) {
+        console.log(`  - Tree SHA: ${item.resolved.treeSha}`);
+      }
+      console.log(`  - Content SHA256: ${item.contentSha256}`);
+      if (item.riskFlags && item.riskFlags.length) {
+        console.log(`  - Security review: required (${item.riskFlags.join('; ')})`);
+      } else {
+        console.log('  - Security review: no high-risk flags detected');
+      }
+    });
+  }
+  console.log('');
+  console.log('## Changed Files');
+  console.log('');
+  if (files.length === 0) {
+    console.log('- None');
+  } else {
+    files.forEach((file) => console.log(`- ${file}`));
+  }
+}
+
+main();

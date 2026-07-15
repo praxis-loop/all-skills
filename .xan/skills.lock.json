@@ -1,0 +1,24 @@
+{
+  "lockfileVersion": 1,
+  "skills": {
+    "cangjie-skill": {
+      "sourceType": "github",
+      "repository": "kangarooking/cangjie-skill",
+      "path": ".",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "ead9e9ddc4bd8477f38573a6614ce8155e1aa505",
+        "treeSha": "1b192ec5ba09855afe260e4960d8e831185f01bf"
+      },
+      "target": "skills/productivity/reading/cangjie-skill",
+      "contentSha256": "sha256:fd33df893cd399b261794c03ad45fa78c72c0c644c5d27e23201509ec8e2bea7",
+      "syncedAt": "2026-07-15T03:48:13.331Z",
+      "riskFlags": [
+        "contains executable helper scripts"
+      ]
+    }
+  }
+}

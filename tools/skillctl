@@ -1,0 +1,229 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+const lib = require('./skillctl-lib');
+
+const repoRoot = path.resolve(__dirname, '..');
+const sourcesFile = path.join(repoRoot, 'sources', 'skills.sources.yaml');
+const lockFile = path.join(repoRoot, '.xan', 'skills.lock.json');
+
+function usage() {
+  console.log(`Usage: tools/skillctl <command> [args]\n\nCommands:\n  add github <repository> --path <path> --target <target> [--name <name>] [--ref <ref>]\n  check\n  update <skill-name> [--dry-run]\n  update --all [--dry-run]\n  sync\n  doctor`);
+}
+
+function loadSources() {
+  return lib.loadYamlFile(sourcesFile, { version: 1, skills: {} });
+}
+
+function saveSources(sources) {
+  lib.writeYamlFile(sourcesFile, sources);
+}
+
+function loadLock() {
+  return lib.loadJsonFile(lockFile, { lockfileVersion: 1, skills: {} });
+}
+
+function saveLock(lock) {
+  lib.writeJsonFile(lockFile, lock);
+}
+
+function parseOption(args, name, fallback) {
+  const index = args.indexOf(name);
+  if (index === -1) return fallback;
+  if (index + 1 >= args.length) throw new Error(`Missing value for ${name}`);
+  return args[index + 1];
+}
+
+function addGithub(args) {
+  const repositoryArg = args[0];
+  if (!repositoryArg) throw new Error('Missing GitHub repository');
+  const sourcePath = parseOption(args, '--path', '.');
+  const target = parseOption(args, '--target', null);
+  if (!target) throw new Error('Missing --target');
+  const name = parseOption(args, '--name', path.basename(target));
+  const ref = parseOption(args, '--ref', 'main');
+  const normalized = lib.normalizeGithubRepository(repositoryArg);
+  const sources = loadSources();
+  sources.version = 1;
+  sources.skills = sources.skills || {};
+  sources.skills[name] = {
+    type: 'github',
+    repository: normalized.repository,
+    path: sourcePath,
+    track: { type: 'branch', value: ref },
+    target
+  };
+  saveSources(sources);
+  console.log(`Added GitHub skill source ${name} -> ${normalized.repository}:${sourcePath}`);
+}
+
+function check() {
+  const sources = loadSources();
+  const lock = loadLock();
+  const errors = lib.validateSources(sources);
+  errors.forEach((error) => console.log(`ERROR: ${error}`));
+
+  const skills = sources.skills || {};
+  const names = Object.keys(skills).sort();
+  if (names.length === 0) {
+    console.log('No external skill sources configured.');
+  }
+
+  names.forEach((name) => {
+    const source = skills[name];
+    const target = path.join(repoRoot, source.target);
+    const locked = lock.skills && lock.skills[name];
+    console.log(`\n${name}`);
+    console.log(`  source: ${source.type}`);
+    console.log(`  target: ${source.target}`);
+
+    if (source.type === 'github') {
+      try {
+        const head = lib.resolveGithubHead(source);
+        if (locked && locked.resolved && locked.resolved.commit === head) {
+          console.log(`  upstream: OK ${head.slice(0, 12)}`);
+        } else if (locked && locked.resolved) {
+          console.log(`  upstream: UPDATE ${locked.resolved.commit.slice(0, 12)} -> ${head.slice(0, 12)}`);
+        } else {
+          console.log(`  upstream: UNLOCKED ${head.slice(0, 12)}`);
+        }
+      } catch (error) {
+        errors.push(`${name}: ${error.message}`);
+        console.log(`  upstream: ERROR ${error.message}`);
+      }
+    }
+
+    if (fs.existsSync(target)) {
+      const actualHash = lib.hashDirectory(target);
+      if (locked && locked.contentSha256 === actualHash) {
+        console.log(`  integrity: OK ${actualHash}`);
+      } else if (locked) {
+        errors.push(`${name}: target hash does not match lockfile`);
+        console.log(`  integrity: MISMATCH actual=${actualHash} locked=${locked.contentSha256}`);
+      } else {
+        console.log(`  integrity: UNLOCKED ${actualHash}`);
+      }
+      const risk = lib.scanSkillRisk(target);
+      if (risk.flags.length) {
+        console.log(`  risk: REVIEW REQUIRED - ${risk.flags.join('; ')}`);
+      } else {
+        console.log('  risk: OK');
+      }
+    } else {
+      console.log('  integrity: target missing');
+      if (locked) errors.push(`${name}: locked target is missing`);
+    }
+  });
+
+  if (errors.length > 0) {
+    console.log(`\nResult: FAIL (${errors.length} issue${errors.length === 1 ? '' : 's'})`);
+    process.exitCode = 1;
+  } else {
+    console.log('\nResult: OK');
+  }
+}
+
+function syncOne(name, source, options, lock) {
+  if (source.type !== 'github') {
+    throw new Error(`${name}: unsupported source type ${source.type}`);
+  }
+  const workDir = lib.makeTempWorkDir();
+  try {
+    const fetched = lib.cloneGithubSource(source, workDir);
+    const staged = path.join(workDir, 'staged');
+    lib.copyDir(fetched.sourcePath, staged);
+    const overlay = lib.loadOverlay(repoRoot, name);
+    const overlayFiles = lib.applyOverlay(staged, overlay);
+    const contentSha256 = lib.hashDirectory(staged);
+    const target = path.join(repoRoot, source.target);
+    const risk = lib.scanSkillRisk(staged);
+    const previous = lock.skills[name];
+    const changed = !previous || previous.contentSha256 !== contentSha256 || !fs.existsSync(target);
+
+    console.log(`\n${name}`);
+    console.log(`  resolved: ${fetched.commit.slice(0, 12)} tree=${fetched.treeSha.slice(0, 12)}`);
+    console.log(`  content: ${contentSha256}`);
+    console.log(`  changed: ${changed ? 'yes' : 'no'}`);
+    if (overlayFiles.length) console.log(`  overlay: ${overlayFiles.join(', ')}`);
+    if (risk.flags.length) console.log(`  risk: REVIEW REQUIRED - ${risk.flags.join('; ')}`);
+    else console.log('  risk: OK');
+
+    if (!options.dryRun && changed) {
+      lib.removeDir(target);
+      lib.copyDir(staged, target);
+      lock.skills[name] = {
+        sourceType: 'github',
+        repository: fetched.repository,
+        path: source.path,
+        requested: source.track,
+        resolved: {
+          commit: fetched.commit,
+          treeSha: fetched.treeSha
+        },
+        target: source.target,
+        contentSha256,
+        syncedAt: new Date().toISOString(),
+        riskFlags: risk.flags
+      };
+    }
+    return changed;
+  } finally {
+    lib.removeDir(workDir);
+  }
+}
+
+function update(args) {
+  const dryRun = args.indexOf('--dry-run') !== -1;
+  const all = args.indexOf('--all') !== -1;
+  const targetName = all ? null : args.filter((arg) => arg !== '--dry-run')[0];
+  const sources = loadSources();
+  const lock = loadLock();
+  lock.lockfileVersion = 1;
+  lock.skills = lock.skills || {};
+  const skills = sources.skills || {};
+  const names = all ? Object.keys(skills).sort() : [targetName];
+  if (!all && !targetName) throw new Error('Missing skill name or --all');
+  let changedCount = 0;
+  names.forEach((name) => {
+    if (!skills[name]) throw new Error(`Unknown external skill source: ${name}`);
+    if (syncOne(name, skills[name], { dryRun }, lock)) changedCount += 1;
+  });
+  if (!dryRun) saveLock(lock);
+  console.log(`\nUpdate result: ${changedCount} changed${dryRun ? ' (dry run)' : ''}`);
+}
+
+function sync() {
+  update(['--all']);
+}
+
+function doctor() {
+  const sources = loadSources();
+  const sourceCount = Object.keys(sources.skills || {}).length;
+  console.log('Xan Skills Supply Chain Doctor');
+  console.log(`Repository: ${repoRoot}`);
+  console.log(`External sources: ${sourceCount}`);
+  check();
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const command = args.shift();
+  try {
+    if (!command || command === '--help' || command === '-h') return usage();
+    if (command === 'add') {
+      const kind = args.shift();
+      if (kind !== 'github') throw new Error('Only add github is supported in v1');
+      return addGithub(args);
+    }
+    if (command === 'check') return check();
+    if (command === 'update') return update(args);
+    if (command === 'sync') return sync();
+    if (command === 'doctor') return doctor();
+    throw new Error(`Unknown command: ${command}`);
+  } catch (error) {
+    console.error(`ERROR: ${error.message}`);
+    process.exitCode = 1;
+  }
+}
+
+main();

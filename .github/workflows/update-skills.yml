@@ -1,0 +1,45 @@
+name: Update external skills
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update external skills
+        run: npm run skillctl -- update --all
+
+      - name: Validate external skills
+        run: npm run skillctl -- check
+
+      - name: Render PR summary
+        run: npm run update-summary > /tmp/skill-update-summary.md
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/update-external-skills
+          delete-branch: true
+          title: "chore(skills): update external skills"
+          commit-message: "chore(skills): update external skills"
+          body-path: /tmp/skill-update-summary.md
+          labels: skills, automated-update

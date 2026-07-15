@@ -1,6 +1,6 @@
-# Xan Skills
+# All Skills
 
-Xan Skills 是一个可复用的 AI Agent Skills 仓库。它把所有 skill 源文件集中维护在一个 Git 仓库中，再通过软链接或 Windows Junction 安装到 Codex、Claude Code 或用户指定的 CLI skill 目录。
+All Skills 是一个可复用的 AI Agent Skills 仓库。它把所有 skill 源文件集中维护在一个 Git 仓库中，再通过软链接或 Windows Junction 安装到 Codex、Claude Code 或用户指定的 CLI skill 目录。
 
 核心原则：**本仓库是唯一真实来源，CLI 的 skill 目录只链接回本仓库**。以后只需要更新这个仓库，已安装的 skill 就会同步获得更新，不需要手工复制。
 
@@ -24,7 +24,7 @@ skills/<function>/<domain>/<skill>/SKILL.md
 ## 目录结构
 
 ```text
-xan-skills/
+all-skills/
 ├── AGENTS.md
 ├── docs/
 │   ├── CATEGORIES.md

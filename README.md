@@ -76,6 +76,8 @@ xan-skills/
 - `skills/content/reports/plain-language-daily-reports`
 - `skills/engineering/code-review/implementation-impact-brief`
 - `skills/productivity/reading/cangjie-skill`（第三方快照，来源见 `sources/skills.sources.yaml`）
+- `skills/productivity/feedback/grill-me`（第三方快照，来源见 `sources/skills.sources.yaml`）
+- `skills/productivity/collaboration/handoff`（第三方快照，来源见 `sources/skills.sources.yaml`）
 
 ## 安装目标
 

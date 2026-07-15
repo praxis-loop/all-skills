@@ -234,13 +234,26 @@ function execGit(args, cwd) {
   }).trim();
 }
 
+function selectLsRemoteRef(output, requested) {
+  if (!output) throw new Error('No refs returned by git ls-remote');
+  const refType = requested && requested.type ? requested.type : 'branch';
+  const refValue = requested && requested.value ? requested.value : 'main';
+  const exactRef = refType === 'tag' ? `refs/tags/${refValue}` : refType === 'branch' ? `refs/heads/${refValue}` : refValue;
+  const lines = output.split('\n').map((line) => line.trim()).filter(Boolean);
+  for (const line of lines) {
+    const parts = line.split(/\s+/);
+    if (parts[1] === exactRef || parts[1] === `${exactRef}^{}`) return parts[0];
+  }
+  if (refType === 'commit' && /^[a-f0-9]{40}$/.test(refValue)) return refValue;
+  throw new Error(`Unable to find exact ref ${exactRef}`);
+}
+
 function resolveGithubHead(source) {
   const normalized = normalizeGithubRepository(source.repository);
-  const ref = source.track && source.track.value ? source.track.value : 'main';
+  const requested = source.track || { type: 'branch', value: 'main' };
+  const ref = requested.value;
   const output = execGit(['ls-remote', normalized.cloneUrl, ref], process.cwd());
-  if (!output) throw new Error(`Unable to resolve ${normalized.repository} ${ref}`);
-  const firstLine = output.split('\n')[0];
-  return firstLine.split(/\s+/)[0];
+  return selectLsRemoteRef(output, requested);
 }
 
 function cloneGithubSource(source, workDir) {
@@ -294,6 +307,7 @@ module.exports = {
   removeDir,
   resolveGithubHead,
   scanSkillRisk,
+  selectLsRemoteRef,
   validateSources,
   writeJsonFile,
   writeYamlFile

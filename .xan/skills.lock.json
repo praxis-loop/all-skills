@@ -19,6 +19,42 @@
       "riskFlags": [
         "contains executable helper scripts"
       ]
+    },
+    "handoff": {
+      "sourceType": "github",
+      "repository": "mattpocock/skills",
+      "path": "skills/productivity/handoff",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "e9fcdf95b402d360f90f1db8d776d5dd450f9234",
+        "treeSha": "184d485ae68a2132893a94239b2b85d253e6152b"
+      },
+      "target": "skills/productivity/collaboration/handoff",
+      "contentSha256": "sha256:5cc5c39b46c2851bc8ccf4dccd3d8f13c58e7e5576208e6fa31ed9089dfe3dc9",
+      "syncedAt": "2026-07-15T06:23:56.643Z",
+      "riskFlags": [
+        "mentions secret-bearing path"
+      ]
+    },
+    "grill-me": {
+      "sourceType": "github",
+      "repository": "mattpocock/skills",
+      "path": "skills/productivity/grill-me",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "e9fcdf95b402d360f90f1db8d776d5dd450f9234",
+        "treeSha": "c817f6f36acd483294144694a935a76d3e3eb101"
+      },
+      "target": "skills/productivity/feedback/grill-me",
+      "contentSha256": "sha256:f0816f0f60fa0116f1ef7ccf646df13526cc21bfb46aa8111302a3de2b4b2a0d",
+      "syncedAt": "2026-07-15T06:24:07.031Z",
+      "riskFlags": []
     }
   }
 }

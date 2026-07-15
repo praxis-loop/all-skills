@@ -8,3 +8,19 @@ skills:
       type: branch
       value: main
     target: skills/productivity/reading/cangjie-skill
+  handoff:
+    type: github
+    repository: mattpocock/skills
+    path: skills/productivity/handoff
+    track:
+      type: branch
+      value: main
+    target: skills/productivity/collaboration/handoff
+  grill-me:
+    type: github
+    repository: mattpocock/skills
+    path: skills/productivity/grill-me
+    track:
+      type: branch
+      value: main
+    target: skills/productivity/feedback/grill-me

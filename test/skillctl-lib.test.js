@@ -97,3 +97,12 @@ test('root skillctl wrapper forwards arguments to the CLI', () => {
   });
   assert.ok(output.includes('Usage: tools/skillctl <command> [args]'));
 });
+
+
+test('selectLsRemoteRef prefers exact branch refs over similarly named branches', () => {
+  const output = [
+    '5ddcfd126a7630eefb8b54088cc6b45e64aa556a\trefs/heads/changeset-release/main',
+    'e9fcdf95b402d360f90f1db8d776d5dd450f9234\trefs/heads/main'
+  ].join('\n');
+  assert.strictEqual(lib.selectLsRemoteRef(output, { type: 'branch', value: 'main' }), 'e9fcdf95b402d360f90f1db8d776d5dd450f9234');
+});

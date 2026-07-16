@@ -7,22 +7,152 @@
 set -euo pipefail
 
 CONFIG_PATH="${HOME}/.clock-in/config.local.json"
-LABEL="com.user.clock-in"
-PLIST_PATH="${HOME}/Library/LaunchAgents/${LABEL}.plist"
+LABEL_PREFIX="com.user.clock-in"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_SH="${SCRIPT_DIR}/open-dingtalk-and-notify.sh"
 
-uninstall() {
-    if [[ ! -f "${PLIST_PATH}" ]]; then
-        echo "Plist not found: ${PLIST_PATH}. Nothing to do."
-        return
-    fi
-    launchctl unload "${PLIST_PATH}" 2>/dev/null || true
-    rm -f "${PLIST_PATH}"
-    echo "Uninstalled."
+read_schedules() {
+    python3 - "${CONFIG_PATH}" <<'PY'
+import json
+import sys
+
+config_path = sys.argv[1]
+with open(config_path, "r", encoding="utf-8") as fh:
+    config = json.load(fh)
+
+if "schedules" in config:
+    schedules = config["schedules"]
+    if not schedules:
+        raise SystemExit("Missing required config value: schedules")
+elif "schedule" in config:
+    schedules = [config["schedule"]]
+else:
+    schedules = [{
+        "taskName": "ClockInDaily",
+        "startTime": "08:50",
+        "randomDelayMinutes": 5,
+        "daysOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    }]
+
+for schedule in schedules:
+    task_name = schedule.get("taskName") or "ClockInDaily"
+    start_time = schedule.get("startTime") or "08:50"
+    random_delay = schedule.get("randomDelayMinutes", 5)
+    days = schedule.get("daysOfWeek") or ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    print("\t".join([str(task_name), str(start_time), str(random_delay), ",".join(days)]))
+PY
 }
 
-install() {
+label_for_task() {
+    local task_name="$1"
+    local suffix
+    suffix="$(printf '%s' "${task_name}" | tr -c 'A-Za-z0-9._-' '-' | sed 's/^-*//; s/-*$//')"
+    if [[ -z "${suffix}" ]]; then
+        suffix="daily"
+    fi
+    printf '%s.%s\n' "${LABEL_PREFIX}" "${suffix}"
+}
+
+uninstall_one() {
+    local task_name="$1"
+    local label plist_path
+
+    label="$(label_for_task "${task_name}")"
+    plist_path="${HOME}/Library/LaunchAgents/${label}.plist"
+
+    if [[ ! -f "${plist_path}" ]]; then
+        echo "Plist not found: ${plist_path}. Nothing to do."
+        return
+    fi
+    launchctl unload "${plist_path}" 2>/dev/null || true
+    rm -f "${plist_path}"
+    echo "Uninstalled: ${label}"
+}
+
+install_one() {
+    local task_name="$1"
+    local start_time="$2"
+    local random_delay="$3"
+    local days_csv="$4"
+    local label plist_path hour minute calendar_xml
+
+    label="$(label_for_task "${task_name}")"
+    plist_path="${HOME}/Library/LaunchAgents/${label}.plist"
+
+    # launchd Weekday: 0/7=Sun, 1=Mon, 2=Tue, ..., 6=Sat
+    calendar_xml=""
+
+    hour="${start_time%%:*}"
+    minute="${start_time##*:}"
+
+    IFS=',' read -ra days <<< "${days_csv}"
+    for day in "${days[@]}"; do
+        trimmed="$(echo "${day}" | xargs)"
+        case "${trimmed}" in
+            Sunday) n=0 ;;
+            Monday) n=1 ;;
+            Tuesday) n=2 ;;
+            Wednesday) n=3 ;;
+            Thursday) n=4 ;;
+            Friday) n=5 ;;
+            Saturday) n=6 ;;
+            *) n="" ;;
+        esac
+        [[ -z "${n}" ]] && continue
+        calendar_xml+="        <dict>"$'\n'
+        calendar_xml+="            <key>Hour</key><integer>${hour}</integer>"$'\n'
+        calendar_xml+="            <key>Minute</key><integer>${minute}</integer>"$'\n'
+        calendar_xml+="            <key>Weekday</key><integer>${n}</integer>"$'\n'
+        calendar_xml+="        </dict>"$'\n'
+    done
+
+    if [[ -z "${calendar_xml}" ]]; then
+        calendar_xml+="        <dict>"$'\n'
+        calendar_xml+="            <key>Hour</key><integer>${hour}</integer>"$'\n'
+        calendar_xml+="            <key>Minute</key><integer>${minute}</integer>"$'\n'
+        calendar_xml+="        </dict>"$'\n'
+    fi
+
+    mkdir -p "${HOME}/Library/LaunchAgents"
+
+    cat > "${plist_path}" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>${label}</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>${SKILL_SH}</string>
+        <string>${CONFIG_PATH}</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <array>
+${calendar_xml}    </array>
+    <key>StandardOutPath</key>
+    <string>${HOME}/.clock-in/${label}.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>${HOME}/.clock-in/${label}.err.log</string>
+</dict>
+</plist>
+EOF
+
+    launchctl unload "${plist_path}" 2>/dev/null || true
+    launchctl load "${plist_path}"
+
+    echo "Installed: ${plist_path}"
+    echo "  Task:   ${task_name}"
+    echo "  Time:   ${start_time}"
+    echo "  Days:   ${days_csv}"
+    echo "  Jitter: ${random_delay} min (not supported by launchd; kept for config parity)"
+    echo "Verify: launchctl list | grep ${LABEL_PREFIX}"
+}
+
+run_all() {
+    local mode="$1"
+
     if [[ ! -f "${CONFIG_PATH}" ]]; then
         echo "Config not found: ${CONFIG_PATH}. Run /clock-in 初始化 first." >&2
         exit 1
@@ -32,78 +162,17 @@ install() {
         chmod +x "${SKILL_SH}"
     fi
 
-    # 从 config 读 schedule 字段（用 python3 解析，macOS 自带）
-    read_schedule() {
-        python3 -c "
-import json, sys
-c = json.load(open('${CONFIG_PATH}'))
-s = c.get('schedule', {})
-print(s.get('taskName', 'ClockInDaily'))
-print(s.get('startTime', '08:50'))
-print(s.get('randomDelayMinutes', 5))
-print(','.join(s.get('daysOfWeek', ['Monday','Tuesday','Wednesday','Thursday','Friday'])))
-"
-    }
-    mapfile -t SCHED < <(read_schedule)
-    TASK_NAME="${SCHED[0]}"
-    START_TIME="${SCHED[1]}"
-    RANDOM_DELAY="${SCHED[2]}"
-    DAYS_CSV="${SCHED[3]}"
-
-    # launchd Weekday: 0/7=Sun, 1=Mon, 2=Tue, ..., 6=Sat
-    declare -A DAY_NUM=([Sunday]=0 [Monday]=1 [Tuesday]=2 [Wednesday]=3 [Thursday]=4 [Friday]=5 [Saturday]=6)
-    WEEKDAY_XML=""
-    IFS=',' read -ra DAYS <<< "${DAYS_CSV}"
-    for d in "${DAYS[@]}"; do
-        trimmed="$(echo "${d}" | xargs)"  # trim whitespace
-        n="${DAY_NUM[${trimmed}]}"
-        [[ -z "${n}" ]] && continue
-        WEEKDAY_XML+="        <key>Weekday</key><integer>${n}</integer>"$'\n'
-    done
-
-    # 解析 HH:MM
-    HOUR="${START_TIME%%:*}"
-    MIN="${START_TIME##*:}"
-
-    mkdir -p "${HOME}/Library/LaunchAgents"
-
-    cat > "${PLIST_PATH}" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>${LABEL}</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/bin/bash</string>
-        <string>${SKILL_SH}</string>
-        <string>${CONFIG_PATH}</string>
-    </array>
-    <key>StartCalendarInterval</key>
-    <array>
-        <dict>
-            <key>Hour</key><integer>${HOUR}</integer>
-            <key>Minute</key><integer>${MIN}</integer>
-${WEEKDAY_XML}    </dict>
-    </array>
-    <key>StandardOutPath</key>
-    <string>${HOME}/.clock-in/launchd.out.log</string>
-    <key>StandardErrorPath</key>
-    <string>${HOME}/.clock-in/launchd.err.log</string>
-</dict>
-</plist>
-EOF
-
-    launchctl unload "${PLIST_PATH}" 2>/dev/null || true
-    launchctl load "${PLIST_PATH}"
-
-    echo "Installed: ${PLIST_PATH}"
-    echo "Verify: launchctl list | grep ${LABEL}"
+    while IFS=$'\t' read -r task_name start_time random_delay days_csv; do
+        if [[ "${mode}" == "uninstall" ]]; then
+            uninstall_one "${task_name}"
+        else
+            install_one "${task_name}" "${start_time}" "${random_delay}" "${days_csv}"
+        fi
+    done < <(read_schedules)
 }
 
 case "${1:-}" in
-    --uninstall|-u) uninstall ;;
-    "") install ;;
+    --uninstall|-u) run_all uninstall ;;
+    "") run_all install ;;
     *) echo "Usage: $0 [--uninstall]" >&2; exit 1 ;;
 esac

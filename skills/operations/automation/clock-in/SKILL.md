@@ -32,7 +32,7 @@ uname -s 2>/dev/null || echo "Windows"
 ```
 
 - 输出 `Darwin` → macOS，使用 `.sh` 脚本
-- 输出 `Windows` 或命令不存在 → Windows，使用 `.ps1` 脚本
+- 输出 `MINGW*` / `MSYS*` / `CYGWIN*` / `Windows`，或命令不存在 → Windows，使用 `.ps1` 脚本
 
 ---
 
@@ -40,8 +40,10 @@ uname -s 2>/dev/null || echo "Windows"
 
 **Windows：**
 ```bash
-powershell.exe -NoProfile -Command "Test-Path '$env:USERPROFILE\.clock-in\config.local.json'"
+powershell.exe -NoProfile -Command 'Test-Path -LiteralPath "$env:USERPROFILE\.clock-in\config.local.json"'
 ```
+
+> 注意：不要在 Git Bash 里使用 `"Test-Path '$env:USERPROFILE\\... '"` 这种写法；外层双引号会让 Bash 先尝试展开 `$env`，导致 PowerShell 检查到错误路径并误判为 `False`。
 
 **macOS：**
 ```bash
@@ -170,28 +172,36 @@ chmod +x ~/.claude/skills/clock-in/scripts/open-dingtalk-and-notify.sh
 - **Windows**：用「任务计划程序」(Task Scheduler)
 - **macOS**：用 `launchd`
 
-### 步骤 1：在 config 中添加 schedule 字段
+### 步骤 1：在 config 中添加 schedules 字段
 
-编辑 `~/.clock-in/config.local.json`，添加：
+编辑 `~/.clock-in/config.local.json`，添加早晚两条任务：
 
 ```json
 {
-  "schedule": {
-    "taskName": "ClockInDaily",
-    "startTime": "08:50",
-    "randomDelayMinutes": 5,
-    "daysOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-  }
+  "schedules": [
+    {
+      "taskName": "ClockInMorning",
+      "startTime": "08:50",
+      "randomDelayMinutes": 5,
+      "daysOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    },
+    {
+      "taskName": "ClockInEvening",
+      "startTime": "20:00",
+      "randomDelayMinutes": 5,
+      "daysOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    }
+  ]
 }
 ```
 
 字段含义：
-- `taskName`：调度任务名（Windows 任务计划程序里显示的名字）
-- `startTime`：触发时间，24h 格式 `HH:MM`
-- `randomDelayMinutes`：在 `startTime` 基础上随机延迟的分钟数（避免每次都精确同一秒打卡）
-- `daysOfWeek`：周几执行，默认周一到周五
+- `schedules[].taskName`：调度任务名（Windows 任务计划程序里显示的名字）；每个时间点应使用不同名称
+- `schedules[].startTime`：触发时间，24h 格式 `HH:MM`
+- `schedules[].randomDelayMinutes`：在 `startTime` 基础上随机延迟的分钟数（Windows 支持；macOS launchd 不支持随机延迟，只保留配置兼容）
+- `schedules[].daysOfWeek`：周几执行，默认周一到周五
 
-不写 `schedule` 段会使用上面的默认值。
+安装脚本优先读取 `schedules` 数组，并为每一项注册一个独立调度任务。旧版单个 `schedule` 对象仍兼容；不写 `schedule` / `schedules` 段会使用默认的 `ClockInDaily` 早上任务。
 
 ### 步骤 2：执行安装脚本
 
@@ -206,22 +216,25 @@ bash ~/.claude/skills/clock-in/scripts/install-schedule.sh
 chmod +x ~/.claude/skills/clock-in/scripts/install-schedule.sh  # 首次运行
 ```
 
-安装脚本会读取 `config.schedule.*`，注册对应的调度任务（Windows Task Scheduler / macOS launchd）。
+安装脚本会读取 `config.schedules[]`，为每个时间点注册一个调度任务（Windows Task Scheduler / macOS launchd）。如果只存在旧版 `config.schedule.*`，则按单个任务处理。
 
 ### 步骤 3：验证
 
 **Windows：**
 ```powershell
-Get-ScheduledTask -TaskName ClockInDaily | Format-List *
+Get-ScheduledTask -TaskName ClockInMorning | Format-List *
+Get-ScheduledTask -TaskName ClockInEvening | Format-List *
 # 立即触发一次（不等到明天）：
-schtasks /run /tn ClockInDaily
+schtasks /run /tn ClockInMorning
+schtasks /run /tn ClockInEvening
 ```
 
 **macOS：**
 ```bash
 launchctl list | grep clock-in
 # 立即触发一次：
-launchctl start com.user.clock-in
+launchctl start com.user.clock-in.ClockInMorning
+launchctl start com.user.clock-in.ClockInEvening
 ```
 
 ### 卸载定时任务

@@ -32,7 +32,7 @@ uname -s 2>/dev/null || echo "Windows"
 ```
 
 - 输出 `Darwin` → macOS，使用 `.sh` 脚本
-- 输出 `Windows` 或命令不存在 → Windows，使用 `.ps1` 脚本
+- 输出 `MINGW*` / `MSYS*` / `CYGWIN*` / `Windows`，或命令不存在 → Windows，使用 `.ps1` 脚本
 
 ---
 
@@ -40,8 +40,10 @@ uname -s 2>/dev/null || echo "Windows"
 
 **Windows：**
 ```bash
-powershell.exe -NoProfile -Command "Test-Path '$env:USERPROFILE\.clock-in\config.local.json'"
+powershell.exe -NoProfile -Command 'Test-Path -LiteralPath "$env:USERPROFILE\.clock-in\config.local.json"'
 ```
+
+> 注意：不要在 Git Bash 里使用 `"Test-Path '$env:USERPROFILE\\... '"` 这种写法；外层双引号会让 Bash 先尝试展开 `$env`，导致 PowerShell 检查到错误路径并误判为 `False`。
 
 **macOS：**
 ```bash

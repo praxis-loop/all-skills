@@ -25,9 +25,18 @@
     "failureBodyPrefix": "失败原因：",
     "iconUrl": "https://play-lh.googleusercontent.com/J93kHXLNdp9pIwH4SKWUoqxr-EUaRh7QAPo5E3Zj1BEbRi_gfLLT2xN-lsSklpiDUSQ8=w240-h480"
   },
-  "schedule": {
-    "taskName": "OpenDingTalkAndNotifyRandomMorning",
-    "startTime": "08:45",
-    "randomDelayMinutes": 5
-  }
+  "schedules": [
+    {
+      "taskName": "ClockInMorning",
+      "startTime": "08:50",
+      "randomDelayMinutes": 5,
+      "daysOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    },
+    {
+      "taskName": "ClockInEvening",
+      "startTime": "20:00",
+      "randomDelayMinutes": 5,
+      "daysOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    }
+  ]
 }

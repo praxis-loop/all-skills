@@ -2,6 +2,12 @@
 
 本を実行可能な AI スキルのセットに蒸留します。
 
+## 公式サイト
+
+🌐 [Cangjie Skill 公式サイトを見る](https://cangjie-skill.pages.dev/)
+
+公式サイトでは、Skill Pack の視覚的な閲覧、初めての方向けの利用ガイド、Skill 詳細、コミュニティへの提出窓口を提供します。cangjie-skill のコード、方法論、テンプレートの唯一のソースは引き続きこの GitHub リポジトリです。公式サイトは展示、ナビゲーション、利用ガイドを担います。
+
 ## なぜこれを作ったのか
 
 最近バズったアイデアがあります：同僚を AI スキルに蒸留する。人が離職しても、その人の経験、口調、仕事のスタイルが AI によってある程度再現できる。[nuwa-skill](https://github.com/alchaincyf/nuwa-skill) はまさにこれを行う——イーロン・マスク skill やウォーレン・バフェット skill のような「人間 skill」を生成します。コンパニオンの [darwin-skill](https://github.com/alchaincyf/darwin-skill) はスキルの自動進化を担当します。
@@ -113,7 +119,7 @@ cangjie-skill/
 ├── README.md              ← 今見ているファイル
 ├── README.en.md           ← 英語版
 ├── README.ja.md           ← 日本語版
-├── LICENSE                ← MIT
+├── LICENSE                ← GNU AGPL v3.0
 ├── SKILL.md               ← メタスキル定義（cangjie-skill の完全な実行仕様）
 ├── methodology/           ← RIA-TV++ の段階別方法論ドキュメント
 ├── extractors/            ← 5つの並行エクストラクターのプロンプト定義
@@ -188,4 +194,4 @@ WeChat 公式アカウント「袋鼠帝 AI 客栈」QR コード:
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+GNU Affero General Public License v3.0. See [LICENSE](./LICENSE).

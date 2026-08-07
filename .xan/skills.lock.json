@@ -76,6 +76,40 @@
         "contains package install command",
         "mentions secret-bearing path"
       ]
+    },
+    "managing-up": {
+      "sourceType": "github",
+      "repository": "refoundai/lenny-skills",
+      "path": "skills/managing-up",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "13598cc54e09399bc1bc1398b0fca284110efb2f",
+        "treeSha": "87e0cd7988c9bce06a2027d642ee2298a92d3353"
+      },
+      "target": "skills/productivity/communication/managing-up",
+      "contentSha256": "sha256:60a35d41645f70c10f8ca0097088de28d6acf9e1336e23ef9b77180db2e3c711",
+      "syncedAt": "2026-08-07T16:32:00.558Z",
+      "riskFlags": []
+    },
+    "professional-communication": {
+      "sourceType": "github",
+      "repository": "softaworks/agent-toolkit",
+      "path": "skills/professional-communication",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "3027f20f3181758385a1bb8c022d4041dfb4de84",
+        "treeSha": "a131460b559752fae7756380394d7e21f7c0db6a"
+      },
+      "target": "skills/productivity/communication/professional-communication",
+      "contentSha256": "sha256:cbbff053f66e52361870d6894179697210504b9303ad479386df9d3e9a2e1fd5",
+      "syncedAt": "2026-08-07T16:32:21.004Z",
+      "riskFlags": []
     }
   }
 }

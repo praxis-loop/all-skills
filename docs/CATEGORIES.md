@@ -32,6 +32,8 @@
 | `oazon-daily` | `skills/content/reports/oazon-daily` | 内容报告：Oazon 每日工作日报 |
 | `plain-language-daily-reports` | `skills/content/reports/plain-language-daily-reports` | 内容报告：大白话日报、周报和项目进展 |
 | `implementation-impact-brief` | `skills/engineering/code-review/implementation-impact-brief` | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
+| `professional-communication` | `skills/productivity/communication/professional-communication` | 职场沟通：邮件、团队消息、会议表达的结构化写作与受众调校 |
+| `managing-up` | `skills/productivity/communication/managing-up` | 职场沟通：向上管理，主动沟通、争取资源、用业务视角提出异议 |
 
 ## 分类规则
 

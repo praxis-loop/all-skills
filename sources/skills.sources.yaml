@@ -32,3 +32,19 @@ skills:
       type: branch
       value: main
     target: skills/engineering/cloudflare/wrangler
+  professional-communication:
+    type: github
+    repository: softaworks/agent-toolkit
+    path: skills/professional-communication
+    track:
+      type: branch
+      value: main
+    target: skills/productivity/communication/professional-communication
+  managing-up:
+    type: github
+    repository: refoundai/lenny-skills
+    path: skills/managing-up
+    track:
+      type: branch
+      value: main
+    target: skills/productivity/communication/managing-up

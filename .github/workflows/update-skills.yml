@@ -7,19 +7,18 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update-skills:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
 
       - name: Install dependencies
@@ -31,15 +30,17 @@ jobs:
       - name: Validate external skills
         run: npm run skillctl -- check
 
-      - name: Render PR summary
-        run: npm run update-summary > /tmp/skill-update-summary.md
+      - name: Render update summary
+        run: npm run update-summary >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          branch: chore/update-external-skills
-          delete-branch: true
-          title: "chore(skills): update external skills"
-          commit-message: "chore(skills): update external skills"
-          body-path: /tmp/skill-update-summary.md
-          labels: skills, automated-update
+      - name: Commit and push updates
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No skill updates to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(skills): update external skills"
+          git push

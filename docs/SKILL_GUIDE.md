@@ -39,6 +39,14 @@ skills/<function>/<domain>/<skill-name>/
 - `SKILL.md` frontmatter 中的 `name` 必须与 `skill-name` 一致。
 - 一个 skill 目录只放一个 skill。
 
+`name` 的硬性约束，与 Agent Skills 开放规范一致，违反会导致 `skills-ref validate` 失败：
+
+- 长度 1 到 64 个字符。
+- 只能包含小写字母、数字和短横线 `-`。
+- 不能以 `-` 开头或结尾，例如 `-pdf`、`pdf-` 都不合法。
+- 不能包含连续短横线 `--`，例如 `pdf--processing` 不合法。
+- 必须与所在目录名完全一致。
+
 ## SKILL.md Frontmatter
 
 默认使用最小跨平台 frontmatter：
@@ -52,11 +60,12 @@ description: 说明这个 skill 做什么，以及什么时候应该使用。把
 
 规则：
 
-- `name` 必填。
-- `description` 必填。
+- `name` 必填，格式约束见上面的命名规则。
+- `description` 必填，非空，长度不超过 1024 个字符。
 - `description` 是触发入口，应同时回答“做什么”和“什么时候用”。
 - 关键触发词放在 `description` 前半段，例如产品名、业务名、任务类型、文件类型或常见用户说法。
 - 描述要具体，避免过宽导致无关场景误触发。
+- 如果使用可选字段 `compatibility` 声明环境依赖，长度不超过 500 个字符。
 - 默认不要加入只属于某个产品的私有 frontmatter 字段，除非这个 skill 明确只服务于该产品。
 - 如果某个 workflow 只能手动触发或需要确认，在正文的边界部分写清楚。
 
@@ -92,7 +101,7 @@ description: 说明这个 skill 做什么，以及什么时候应该使用。把
 
 编写要求：
 
-- `SKILL.md` 控制在 500 行以内。
+- `SKILL.md` 控制在 500 行以内，正文建议不超过 5000 tokens。
 - 长表格、长示例、平台规则、API 细节、风格指南放入 `references/`。
 - 从 `SKILL.md` 使用相对路径引用支持文件，例如 `references/schema.md`。
 - 避免多层引用链。重要参考文件应直接从 `SKILL.md` 链接。
@@ -212,9 +221,11 @@ printf 'a\n4\n%s\n' "$tmp" | bash scripts/install.sh
 
 ## 提交前审查清单
 
-- `SKILL.md` 存在，文件名大写。
+- `SKILL.md` 存在，文件名大写或小写都能被识别，规范写法是大写 `SKILL.md`。
 - 目录符合 `skills/<function>/<domain>/<skill-name>/SKILL.md`。
 - frontmatter 包含有效的 `name` 和 `description`。
+- `name` 长度不超过 64 个字符，不以 `-` 开头或结尾，不含连续 `--`。
+- `description` 非空且长度不超过 1024 个字符。
 - `description` 同时说明能力和触发时机。
 - `skill-name` 与 frontmatter `name` 一致。
 - 正文包含目的、输入、工作流程、输出要求、检查项、边界。

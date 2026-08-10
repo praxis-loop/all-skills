@@ -12,28 +12,36 @@
 
 | Function | 状态 | 适用范围 | 常见子类 |
 |---|---|---|---|
-| `engineering` | 规划中 | 软件工程、内部工具、自动化脚本、系统集成 | `backend`、`frontend`、`devops`、`security`、`testing`、`code-review` |
+| `engineering` | 已启用 | 软件工程、内部工具、自动化脚本、系统集成 | `backend`、`frontend`、`devops`、`security`、`testing`、`code-review`、`cloudflare` |
 | `marketing` | 规划中 | 增长、流量、广告、SEO、活动和转化 | `seo`、`ads`、`email`、`social`、`campaigns` |
 | `ecommerce` | 规划中 | 电商平台、商品内容、销售转化和平台规则 | `amazon`、`listing`、`product-research`、`reviews`、`marketplace-compliance` |
 | `operations` | 已启用 | 业务运营、SOP、供应商、库存、履约、自动化执行 | `sop`、`inventory`、`suppliers`、`fulfillment`、`automation` |
 | `content` | 已启用 | 文案、报告、知识库、脚本、内容资产 | `copywriting`、`blog`、`scripts`、`reports`、`knowledge-base` |
-| `media` | 规划中 | 图片、视频、视觉提示词、设计资产和创意生产 | `images`、`video`、`prompts`、`design-review` |
+| `media` | 已启用 | 图片、视频、视觉提示词、设计资产和创意生产 | `images`、`video`、`video-summary`、`prompts`、`design-review` |
 | `data` | 规划中 | 数据查询、分析、报表、仪表盘和数据库工作流 | `analytics`、`reporting`、`dashboards`、`spreadsheets`、`databases` |
 | `finance` | 规划中 | 定价、利润、预算、对账、现金流 | `pricing`、`profit`、`budgeting`、`reconciliation` |
 | `legal` | 规划中 | 合同、合规、政策、条款和风险检查 | `contracts`、`compliance`、`policies` |
 | `customer-support` | 规划中 | 售后、工单、评价、退款和客户沟通 | `faq`、`tickets`、`replies`、`refunds` |
-| `productivity` | 规划中 | 个人计划、复盘、习惯、知识整理和效率流程 | `planning`、`review`、`personal-routines`、`knowledge-management` |
+| `productivity` | 已启用 | 个人计划、复盘、习惯、知识整理和效率流程 | `planning`、`review`、`personal-routines`、`knowledge-management`、`collaboration`、`communication`、`feedback`、`reading` |
 
 ## 当前 Skill
 
-| Skill | 路径 | 说明 |
-|---|---|---|
-| `clock-in` | `skills/operations/automation/clock-in` | 日常运营自动化：钉钉打卡和通知 |
-| `oazon-daily` | `skills/content/reports/oazon-daily` | 内容报告：Oazon 每日工作日报 |
-| `plain-language-daily-reports` | `skills/content/reports/plain-language-daily-reports` | 内容报告：大白话日报、周报和项目进展 |
-| `implementation-impact-brief` | `skills/engineering/code-review/implementation-impact-brief` | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
-| `professional-communication` | `skills/productivity/communication/professional-communication` | 职场沟通：邮件、团队消息、会议表达的结构化写作与受众调校 |
-| `managing-up` | `skills/productivity/communication/managing-up` | 职场沟通：向上管理，主动沟通、争取资源、用业务视角提出异议 |
+来源为「第三方」的 skill 是快照，通过 `sources/skills.sources.yaml` 声明并由 `skillctl` 同步，不要手工修改其目录。
+
+| Skill | 路径 | 来源 | 说明 |
+|---|---|---|---|
+| `oazon-daily` | `skills/content/reports/oazon-daily` | 自有 | 内容报告：Oazon 每日工作日报 |
+| `plain-language-daily-reports` | `skills/content/reports/plain-language-daily-reports` | 自有 | 内容报告：大白话日报、周报和项目进展 |
+| `wrangler` | `skills/engineering/cloudflare/wrangler` | 第三方 | Cloudflare：Wrangler CLI 部署与管理 Workers、KV、R2、D1 等资源 |
+| `implementation-impact-brief` | `skills/engineering/code-review/implementation-impact-brief` | 自有 | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
+| `server-docker-compose-standard` | `skills/engineering/devops/server-docker-compose-standard` | 自有 | 运维标准：`/opt/docker` 下一服务一个 Docker Compose 项目的部署规范 |
+| `video-summary-service` | `skills/media/video-summary/video-summary-service` | 自有 | 视频处理：调用已部署的 Video Summary 服务对短视频链接做异步摘要 |
+| `clock-in` | `skills/operations/automation/clock-in` | 自有 | 日常运营自动化：钉钉打卡和通知 |
+| `handoff` | `skills/productivity/collaboration/handoff` | 第三方 | 协作交接：把当前会话压缩成交接文档，供下一个 agent 接手 |
+| `managing-up` | `skills/productivity/communication/managing-up` | 第三方 | 职场沟通：向上管理，主动沟通、争取资源、用业务视角提出异议 |
+| `professional-communication` | `skills/productivity/communication/professional-communication` | 第三方 | 职场沟通：邮件、团队消息、会议表达的结构化写作与受众调校 |
+| `grill-me` | `skills/productivity/feedback/grill-me` | 第三方 | 方案打磨：用高强度追问审视一份计划或设计 |
+| `cangjie-skill` | `skills/productivity/reading/cangjie-skill` | 第三方 | 知识蒸馏：把书籍、长视频、播客、课程拆解成一组可执行 skill |
 
 ## 分类规则
 

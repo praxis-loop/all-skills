@@ -42,6 +42,7 @@
 | `professional-communication` | `skills/productivity/communication/professional-communication` | 第三方 | 职场沟通：邮件、团队消息、会议表达的结构化写作与受众调校 |
 | `grill-me` | `skills/productivity/feedback/grill-me` | 第三方 | 方案打磨：用高强度追问审视一份计划或设计 |
 | `cangjie-skill` | `skills/productivity/reading/cangjie-skill` | 第三方 | 知识蒸馏：把书籍、长视频、播客、课程拆解成一组可执行 skill |
+| `done` | `skills/productivity/review/done` | 自有 | 复盘沉淀：会话结束时复盘本次+历史会话，产出提问模板、项目记忆、知识短板、跨会话固定流程→建议新 skill，先汇报后拍板 |
 
 ## 分类规则
 

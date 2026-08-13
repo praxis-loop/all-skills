@@ -30,6 +30,7 @@
 
 | Skill | 路径 | 来源 | 说明 |
 |---|---|---|---|
+| `mm-daily-log` | `skills/content/reports/mm-daily-log` | 自有 | 内容报告：从 Mattermost（mm.oazon.com）抓取某天会话，整理成本人的日报草稿，交接 `oazon-daily` 落库 |
 | `oazon-daily` | `skills/content/reports/oazon-daily` | 自有 | 内容报告：Oazon 每日工作日报 |
 | `plain-language-daily-reports` | `skills/content/reports/plain-language-daily-reports` | 自有 | 内容报告：大白话日报、周报和项目进展 |
 | `wrangler` | `skills/engineering/cloudflare/wrangler` | 第三方 | Cloudflare：Wrangler CLI 部署与管理 Workers、KV、R2、D1 等资源 |

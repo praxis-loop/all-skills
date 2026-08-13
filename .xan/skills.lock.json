@@ -110,6 +110,138 @@
       "contentSha256": "sha256:cbbff053f66e52361870d6894179697210504b9303ad479386df9d3e9a2e1fd5",
       "syncedAt": "2026-08-07T16:32:21.004Z",
       "riskFlags": []
+    },
+    "lark-shared": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-shared",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "e7818ff487738e13d692e44dbb9eeb799ac7e706"
+      },
+      "target": "skills/platforms/lark/lark-shared",
+      "contentSha256": "sha256:f54733651f12233afdf69c75d78c8362fb8d0790c69426fdac69e697a64c5878",
+      "syncedAt": "2026-08-13T16:16:55.379Z",
+      "riskFlags": [
+        "mentions secret-bearing path"
+      ]
+    },
+    "lark-base": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-base",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "8cc6c78c32b505ea345fb164e2a99a9e4f00ab69"
+      },
+      "target": "skills/platforms/lark/lark-base",
+      "contentSha256": "sha256:306855527c1eb7804ea20446cb52ed6a203902fdd4c6e4fb1136f569693b393f",
+      "syncedAt": "2026-08-13T16:22:42.840Z",
+      "riskFlags": [
+        "mentions secret-bearing path"
+      ]
+    },
+    "lark-doc": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-doc",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "70c07bf3f9131197d1662093a84fb6dcc66a9db2"
+      },
+      "target": "skills/platforms/lark/lark-doc",
+      "contentSha256": "sha256:cc5b35f2b7d9348a7f106204ec4e751504bbb03e7f7b41fb042be53feb0ccc8c",
+      "syncedAt": "2026-08-13T16:19:16.967Z",
+      "riskFlags": [
+        "mentions secret-bearing path"
+      ]
+    },
+    "lark-im": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-im",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "87d1f95bbfc6f3df9e416ca36a1b7d7a4c09fb83"
+      },
+      "target": "skills/platforms/lark/lark-im",
+      "contentSha256": "sha256:c6bacb272b18b88db52ce6d58fcfe5f4599cc47502b0eae189994b9a2631b3e0",
+      "syncedAt": "2026-08-13T16:20:34.872Z",
+      "riskFlags": [
+        "mentions secret-bearing path"
+      ]
+    },
+    "lark-whiteboard": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-whiteboard",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "dc5eae804df0a67dd9ea9cb7ebe7f197bc31663f"
+      },
+      "target": "skills/platforms/lark/lark-whiteboard",
+      "contentSha256": "sha256:f6ee80320af3d660c124a8efe400cb5d53e240fc317f059e3801e0df4cfe0f72",
+      "syncedAt": "2026-08-13T16:14:06.841Z",
+      "riskFlags": []
+    },
+    "lark-drive": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-drive",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "69a4c7cd55aa419aa2f53f3cf5f328f4f50f58d5"
+      },
+      "target": "skills/platforms/lark/lark-drive",
+      "contentSha256": "sha256:9b371eabd3d0b13147a0cb1d3dee7d481323daf4bf1f8d11733ff6cb1def5324",
+      "syncedAt": "2026-08-13T16:42:11.853Z",
+      "riskFlags": [
+        "mentions secret-bearing path"
+      ]
+    },
+    "lark-sheets": {
+      "sourceType": "github",
+      "repository": "larksuite/cli",
+      "path": "skills/lark-sheets",
+      "requested": {
+        "type": "branch",
+        "value": "main"
+      },
+      "resolved": {
+        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
+        "treeSha": "97a53977beb2218d27ae04586e79dbc84ebf63be"
+      },
+      "target": "skills/platforms/lark/lark-sheets",
+      "contentSha256": "sha256:56fa11d735dd3415501be92e5a548b593d4f900137b121da152f57fa0331a00e",
+      "syncedAt": "2026-08-13T16:38:16.445Z",
+      "riskFlags": [
+        "mentions secret-bearing path",
+        "contains executable helper scripts"
+      ]
     }
   }
 }

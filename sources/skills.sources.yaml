@@ -48,3 +48,59 @@ skills:
       type: branch
       value: main
     target: skills/productivity/communication/managing-up
+  lark-shared:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-shared
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-shared
+  lark-doc:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-doc
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-doc
+  lark-im:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-im
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-im
+  lark-base:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-base
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-base
+  lark-whiteboard:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-whiteboard
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-whiteboard
+  lark-drive:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-drive
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-drive
+  lark-sheets:
+    type: github
+    repository: larksuite/cli
+    path: skills/lark-sheets
+    track:
+      type: branch
+      value: main
+    target: skills/platforms/lark/lark-sheets

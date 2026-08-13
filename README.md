@@ -32,7 +32,7 @@ all-skills/
 └── .xan/         # 第三方 skill 锁定信息
 ```
 
-顶层分类：`engineering`、`marketing`、`ecommerce`、`operations`、`content`、`media`、`data`、`finance`、`legal`、`customer-support`、`productivity`。
+顶层分类：`engineering`、`marketing`、`ecommerce`、`operations`、`content`、`media`、`data`、`finance`、`legal`、`customer-support`、`productivity`、`platforms`。
 
 ## 安装
 

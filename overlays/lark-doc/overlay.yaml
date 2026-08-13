@@ -1,0 +1,11 @@
+# 本地改造：注入 lark-cli 前置检查。
+# lark-doc 正文明确要求"不预读 lark-shared"，所以前置检查必须直接落在本 skill 里。
+replace:
+  - file: SKILL.md
+    from: "# docs"
+    to: |-
+      # docs
+
+      > **前置检查（本地追加）**：首次执行 lark-cli 前先跑
+      > `command -v lark-cli >/dev/null || { echo '缺少 lark-cli，先执行：npx @larksuite/cli@latest install'; exit 1; }`
+      > 未安装时直接把安装命令给用户，不要自行猜测安装方式。

@@ -6,7 +6,9 @@
 - `domain`：该职能内的主题领域，例如 `engineering/security`、`marketing/seo`、`legal/contracts`。
 - `skill`：具体可复用能力，目录内必须包含 `SKILL.md`。
 
-分类优先按照 OPC 的真实经营职能来组织，而不是按照底层技术、脚本语言或某个具体 CLI 来组织。
+分类优先按照 OPC 的真实经营职能来组织，而不是按照底层技术或脚本语言来组织。
+
+例外是 `platforms`：当一组 skill 的共性不是"哪个部门在用"，而是"绑定同一个外部平台、共用同一套 CLI 与授权体系"时，按平台归类比按职能归类更好找、也更好维护。判断标准见 `platforms` 行的说明。
 
 ## 顶层职能分类
 
@@ -23,6 +25,7 @@
 | `legal` | 规划中 | 合同、合规、政策、条款和风险检查 | `contracts`、`compliance`、`policies` |
 | `customer-support` | 规划中 | 售后、工单、评价、退款和客户沟通 | `faq`、`tickets`、`replies`、`refunds` |
 | `productivity` | 已启用 | 个人计划、复盘、习惯、知识整理和效率流程 | `planning`、`review`、`personal-routines`、`knowledge-management`、`collaboration`、`communication`、`feedback`、`reading` |
+| `platforms` | 已启用 | 外部 SaaS / 平台的 API 与 CLI 绑定。同一 domain 下的 skill 共用一套凭据、scope 和安全边界，通常成组 vendored 自厂商仓库 | `lark` |
 
 ## 当前 Skill
 
@@ -38,6 +41,13 @@
 | `server-docker-compose-standard` | `skills/engineering/devops/server-docker-compose-standard` | 自有 | 运维标准：`/opt/docker` 下一服务一个 Docker Compose 项目的部署规范 |
 | `video-summary-service` | `skills/media/video-summary/video-summary-service` | 自有 | 视频处理：调用已部署的 Video Summary 服务对短视频链接做异步摘要 |
 | `clock-in` | `skills/operations/automation/clock-in` | 自有 | 日常运营自动化：钉钉打卡和通知 |
+| `lark-shared` | `skills/platforms/lark/lark-shared` | 第三方 | 飞书基座：`lark-cli` 应用配置、登录授权、user/bot 身份切换、scope 排障，其余 lark skill 均引用它 |
+| `lark-doc` | `skills/platforms/lark/lark-doc` | 第三方 | 飞书云文档：Docx / Wiki 读取、创建、编辑、历史版本，素材与画板 |
+| `lark-im` | `skills/platforms/lark/lark-im` | 第三方 | 飞书消息：发送回复、群聊管理、消息搜索、图片文件收发 |
+| `lark-base` | `skills/platforms/lark/lark-base` | 第三方 | 飞书多维表格：表、字段、记录、视图、仪表盘与数据聚合 |
+| `lark-drive` | `skills/platforms/lark/lark-drive` | 第三方 | 飞书云空间：文件上传下载、文档搜索、副本与权限、文档评论 |
+| `lark-sheets` | `skills/platforms/lark/lark-sheets` | 第三方 | 飞书电子表格：读写、追加、查找、导出 |
+| `lark-whiteboard` | `skills/platforms/lark/lark-whiteboard` | 第三方 | 飞书画板：图形 DSL 渲染，被 `lark-doc` 的画板链路调用 |
 | `handoff` | `skills/productivity/collaboration/handoff` | 第三方 | 协作交接：把当前会话压缩成交接文档，供下一个 agent 接手 |
 | `managing-up` | `skills/productivity/communication/managing-up` | 第三方 | 职场沟通：向上管理，主动沟通、争取资源、用业务视角提出异议 |
 | `professional-communication` | `skills/productivity/communication/professional-communication` | 第三方 | 职场沟通：邮件、团队消息、会议表达的结构化写作与受众调校 |

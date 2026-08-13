@@ -1,0 +1,18 @@
+# 本地改造：注入 lark-cli 前置检查。
+# skillctl sync 会整目录覆盖上游快照，本文件在每次同步后自动重放。
+# from 匹配不到会直接报错——上游改了标题时立刻暴露，而不是静默失效。
+replace:
+  - file: SKILL.md
+    from: "# lark-cli 共享规则"
+    to: |-
+      # lark-cli 共享规则
+
+      ## 前置检查（本地追加）
+
+      执行任何 lark-cli 命令前，先确认二进制存在：
+
+      ```bash
+      command -v lark-cli >/dev/null || { echo '缺少 lark-cli，先执行：npx @larksuite/cli@latest install'; exit 1; }
+      ```
+
+      未安装时不要尝试其他路径或自行猜测安装方式，直接把上面的安装命令给用户。

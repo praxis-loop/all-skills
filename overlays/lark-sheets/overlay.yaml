@@ -1,0 +1,10 @@
+# 本地改造：注入 lark-cli 前置检查。
+replace:
+  - file: SKILL.md
+    from: "# sheets"
+    to: |-
+      # sheets
+
+      > **前置检查（本地追加）**：首次执行 lark-cli 前先跑
+      > `command -v lark-cli >/dev/null || { echo '缺少 lark-cli，先执行：npx @larksuite/cli@latest install'; exit 1; }`
+      > 未安装时直接把安装命令给用户，不要自行猜测安装方式。

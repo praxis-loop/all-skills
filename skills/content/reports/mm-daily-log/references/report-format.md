@@ -5,41 +5,46 @@
 - [规范](#规范)
 - [写作要求](#写作要求)
 - [工时分配](#工时分配)
-- [样例一：CalendarLoop 增量同步（2026-08-11）](#样例一calendarloop-增量同步2026-08-11)
-- [样例二：v1.0.1 上线与事故整改（2026-08-12）](#样例二v101-上线与事故整改2026-08-12)
+- [样例：2026-08-13](#样例2026-08-13)
 - [反例](#反例)
+- [从底稿到成稿](#从底稿到成稿)
 
 ## 规范
 
 两层结构，不要出现第三层：
 
 ```
-- **<项目 / 分类名>**
-    - <做了什么>：<关键动作、结论或数据>（Xh）
-    - <做了什么>：<关键动作、结论或数据>（Xh）
+- **<项目名>**
+    - <一句话说清做了什么 + 结果>（Xh）
 - **其他**
-    - <零散事项合并成一条>（Xh）
+    - <零散事项>（Xh）
 ```
 
 硬性要求：
 
+- **项目名用短名**：产品 / 服务 / 仓库名即可（`SyncSign`、`MOCREO V3`、`CalendarLoop`、`http_server`），归不进去的一律进 `其他`。不要写成「SyncSign Beta 环境（253 Beta Worker）」这种带修饰语的长标题。
 - 项目名一行，**不带时长**。
+- **每个子条目正文 ≤30 字**（不含卡片 URL 与末尾工时）。超了就是没提炼干净，删修饰、删过程、只留结论。
 - 每个子条目末尾必须有时长，最小单位 0.5h。
-- 单条 = 「做了什么 + 关键结论/数据」，不是单纯的动作流水。
-- 项目分类**按当天实际主线归并**，不套用固定项目列表；零散事项统一归入最后的「其他」。
-- Boost 卡片写成 Markdown 链接：`[卡片标题](https://boost.oazon.com/kanban/board/<board>?card=<card>)`。
+- 一条只说一件事。同一张卡的两个阶段可以拆成两条，各自计时。
+- Boost 卡片链接**直接套在已有文字上**，不为了加链接而增字：`定[测试环境隔离方案](url)：共用数据库、独立缓存（1h）`。
 - 全天合计约 8h（写入 `daily.md` 时由 `oazon-daily` 做精确配平，本 skill 只需给出接近 8h 的草稿）。
+- 末尾可加一行「明日待跟进」，逗号分隔、不计工时。
 
 写入 `daily.md` 的最终形态由 `oazon-daily` 负责，那边用 tab 缩进、`(Xh)` 半角括号、日期形如 `8.12`。**本 skill 产出的是聊天里可读、可直接粘贴的草稿**，两者内容一致、缩进与括号形态可能略有差异。
 
 ## 写作要求
 
-- 工程师日报风格：技术性、简洁，不做营销式修饰。
-- **带上能证明结论的数据**。「优化了同步性能」是废话，「PROPFIND 1,157/min → 1/min、502 从 24.9% 清零」才是日报。
-- 写**你的判断和拍板**，不只写执行动作。「拍板维持 Fixed 250MB 不升级」比「评估了 Redis 套餐」有价值。
+- **说人话**。日报是给人看的，不是给编译器看的：不写函数名、文件名、参数名、变量名、commit hash、卡片 id。
+  - ✗ `据「生产 Node 走生产 Lambda」的口径去掉 allowlist 与 CLOUD_WORKER_TOKEN`
+  - ✓ `砍掉多余的白名单与令牌校验，改动最小化`
+- **保留能证明结论的数字**。数字是日报里唯一不能删的东西——台数、条数、百分比、前后对比都留着，它们既短又是证据。
+  - ✗ `上线了通知走错环境的修复`
+  - ✓ `上线通知走错环境的修复，1800 条任务已切回`
+- 写**你的判断和拍板**，不只写执行动作。「推翻缓存内存估算，要求以实测为准」比「评估了缓存内存」有价值。
 - 推翻自己或被别人推翻的结论值得写——它体现了排查过程。
 - 只写**本人**经手、拍板、驱动的事。你让 bot 干的活算你的；别人在频道里干的事不算。
-- 中文为主，代码标识符、commit hash、指标名保留原文。
+- 中文为主。产品名、机型号（`SD1`、`LS1`）保留原文，其余技术标识符一律翻译成业务说法。
 
 ## 工时分配
 
@@ -54,45 +59,56 @@
 
 判断依据用消息时间跨度：某个话题从 09:47 聊到 11:33，就是 1.5h 左右，不要凭感觉给。多线并行时按主导线计，不要重复计时导致总和虚高。
 
-## 样例一：CalendarLoop 增量同步（2026-08-11）
+## 样例：2026-08-13
 
-用户手写、被采纳的真实条目，作为格式基准：
-
-```markdown
-- **CalendarLoop**
-    - 增量同步代码 review 与缺陷修复：失败轮不回写 httpEtag（避免下轮 304 跳过致失败事件不重试）、init 失败整轮干净报错、删除事件改「首轮标记＋次轮确认」、lastSyncTime 记扫描时刻、DELETE_GRACE_MS/cron 间隔改依 BAIKAL_SYNC_INTERVAL 不再硬编码（2h）
-    - ICS 源健壮性加固：源站故障返回「200＋空/残缺正文」的「事件数为 0」防线、添加日历源时校验是否真为 iCalendar、非 .ics 链接返回错误提示（1h）
-    - Cozi/iCloud/Yahoo 不合规内容适配：改用 VObject 解析后重新序列化，修复 RRULE UNTIL 早于 DTSTART、全天事件格式、空实例集重复事件误判、attendee.val 误当邮箱、splitICal 解析失败等缺陷，改 dev→发 beta（1.5h）
-    - beta(253) 部署验证：同步间隔调 3min，用 Yahoo/Cozi/iCloud 真实链接跑增删改 V1–V5 验证（1h）
-    - 测试用例与提测：梳理覆盖三源增删改及重复规则边界的用例、核对 `prd-v1.0.0/20251027` 后 commit 均有对应卡片/用例、更新[提测信息](https://boost.oazon.com/kanban/board/13naqw3fcxkd5ya?card=5a5pfd2vnkvxp2a)、提醒测试补边界条件（1.5h）
-- **其他**
-    - 卡片/版本治理：FamilyCalendar 相关卡标版本 v1.0.1、迁移到 [CalendarLoop Server 看板](https://boost.oazon.com/kanban/board/ff5y2lbao340rpa)（含前置子卡）、补生产验证指标与方法、缺陷卡指派 jasmin 待测试（0.5h）
-    - 订正 Smart Server v1.1.2 卡片归属、产测计划鉴权 DDL 调至 08-21；确认改动同步推送 GitHub、核对 ts.anypi.com 写 tsdb 是否经 tsdb_filter（0.5h）
-```
-
-合计 8h。注意每条都落到了具体机制、文件名或参数，没有一条是「优化了 XX」。
-
-## 样例二：v1.0.1 上线与事故整改（2026-08-12）
-
-由本 skill 从 Mattermost 生成、经用户采纳的条目（节选三条，展示"带数据"和"写拍板"）：
+本 skill 生成、经用户逐轮精简后采纳的最终版，作为格式基准：
 
 ```markdown
+- **SyncSign**
+    - 定[测试环境隔离方案](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=nrw0pkjv12g05op)：共用数据库、独立缓存（1h）
+    - 砍掉多余的[白名单与令牌校验](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=zohrb3x76zwmoy3)，改动最小化（0.5h）
+    - [253 上跑通测试环境](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=c9fhvr1uqhu3iub)并[配好外网域名](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=2pcac719wh3ywrb)（1h）
+    - 修复[日历列表只能拉 50 个](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=3jjjpxm433159ua)，改为自动翻页（1h）
+    - 定[授权房间方案](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=hi8yw4rfif8ct6r)：用户手填房间邮箱绑定（0.5h）
+    - 上线[通知走错环境的修复](https://boost.oazon.com/kanban/board/82zp0oq64sar6j8?card=hbuq2yhhs2mbrus)，1800 条任务已切回（0.5h）
+- **MOCREO V3**
+    - 核实[改库须同步网关](https://boost.oazon.com/kanban/board/b0cs9cgibjv84yz?card=8irvvo48at2nxwi)，脚本改为定点操作（1h）
+    - [50 台设备重建 166 条规则](https://boost.oazon.com/kanban/board/b0cs9cgibjv84yz?card=8irvvo48at2nxwi)，验收全过（0.5h）
 - **CalendarLoop**
-    - v1.0.1 生产发布与部署后验收：确认部署自证跑的是 `f7af4bd`、增量代码在线、baikal/postgres 未动，验收三项核心指标全部达标（PROPFIND 1,157/min→1/min、502 从 24.9% 清零、session 产生速率 7.6/s→0.05/s），关闭[探活根因](https://boost.oazon.com/kanban/board/ff5y2lbao340rpa?card=tvyqstx9cofcrhl)等三张卡；确认部署后根分区下降是 `--build` 新镜像占用（+0.76GB，npm 层 754MB），旧镜像先打 tag 备回滚（1.5h）
-- **http_server 误告警事故整改（INC-2026-005）**
-    - 根因追问到底：确认判离线用墙上时间比一个自己已停止刷新的心跳 score（`MAX_OFFLINE_TIME=25` < 中断 28 分钟），且 `getHeartbeatRange` 读完即删，闸必须设在 ZRANGEBYSCORE 之前；追问后指出 `now - lastIngestAt` 在宕机→恢复场景永远不生效，推翻方案 A 单独可用的结论（1.5h）
+    - 定位负载抖动主因，加 [3 分钟缓存挡 70% 请求](https://boost.oazon.com/kanban/board/ff5y2lbao340rpa?card=pvsrqj74pcfgj0s)（0.5h）
+    - 推翻[缓存内存估算](https://boost.oazon.com/kanban/board/ff5y2lbao340rpa?card=pvsrqj74pcfgj0s)，要求以实测为准（0.5h）
+- **http_server**
+    - 提出[离线误告警静默方案](https://boost.oazon.com/kanban/board/mgmem36uyn27qte?card=iju2hw4zcxb8svu)，评审发现两处漏洞（0.5h）
 - **其他**
-    - [UPSTASH Redis 付费计划评估](https://boost.oazon.com/kanban/board/b0cs9cgibjv84yz?card=wuh975ss1wivhme)：提供用量截图、澄清 auto-upgrade 已开与付款日为 3 号，逐轮修正周期口径后定论「日常日均 ≈1 GB/天，两种口径都不会撞 50 GB」，拍板维持 Fixed 250MB($10/月) 不升级并关卡（0.5h）
+    - 纠正[产测 App 指纹判定](https://boost.oazon.com/kanban/board/uwn7yddzqun9omj?card=vl7fgd9075i9q30)，定本周排期（0.5h）
+
+明日待跟进：确认 50 台设备规则生效、日历修复提测、测试环境端到端验证。
 ```
+
+合计 8h。12 条，最长一条 22 字。注意每条都落到了具体结果或数字，没有一条是「优化了 XX」；同一张卡（MOCREO V3、CalendarLoop）拆成两条时各自计时。
 
 ## 反例
 
-以下写法应当避免：
+以下写法应当避免。**前三行是真实的返工记录**——2026-08-13 这份日报被用户连退四轮，退的都是同一件事：太长、太技术。
 
 | 反例 | 问题 | 改法 |
 |---|---|---|
-| `- 处理了日历同步问题（2h）` | 没说做了什么、结论是什么 | 写清机制、指标前后对比 |
+| `据「生产 Node 走生产 Lambda→生产 Worker」的路由口径，判定 Node allowlist 与 CLOUD_WORKER_TOKEN 鉴权均无必要并全部移除，最终只保留 3 处改动（0.5h）` | 58 字、堆满标识符 | `砍掉多余的白名单与令牌校验，改动最小化（0.5h）` |
+| `- **SyncSign Beta 环境（253 Beta Worker）**` | 项目名带修饰语，还把同一项目拆成了多个大项 | `- **SyncSign**`，同项目的事全放它下面 |
+| `执行 A–H 七步共 239 次写操作（改名 4 台、归组 5 台、删旧规则 14 条、建新规则 166 条），6 项验收全过（0.5h）` | 细节堆砌，读的人只关心结果 | `50 台设备重建 166 条规则，验收全过（0.5h）` |
+| `- 处理了日历同步问题（2h）` | 没说结果，也没有数字 | 留一个能证明的数字 |
 | `- 参与讨论服务器告警（1h）` | 「参与讨论」不是产出 | 写出你的判断和最终定的方案 |
 | `- **CalendarLoop**（3h）` | 项目名带了时长 | 时长只挂在子条目上 |
 | 把全公司的事都写进来 | 日报是个人工作记录 | 只写本人经手、拍板、驱动的 |
 | 合计 6h 或 11h | 不符合 8h 规范 | 合并或拆分条目，让总和落在 8h |
+
+## 从底稿到成稿
+
+30 字的限制约束的是**表达**，不是**依据**。归纳时该看的细节一样要看全，否则压出来的句子会失真。
+
+建议两步走，但**只把成稿发给用户**：
+
+1. **底稿（自己看）**：按「做了什么 + 机制/根因 + 数据 + 卡片」写全，用来核对每条都有原始消息支撑、工时估得住。
+2. **成稿（发出去）**：逐条压到 30 字以内——删机制解释、删标识符、删过程副词，保留动作、结果、数字、链接。
+
+一条压不进 30 字，通常是它本来就是两件事，拆成两条各自计时即可。

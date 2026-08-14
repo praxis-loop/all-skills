@@ -45,6 +45,7 @@ Do not overwrite a target CLI skill directory when the existing target is a real
 
 - Keep the filesystem as the source of truth for approved runtime skills. Do not restore `registry.json`.
 - Own skills directly under `skills/`; do not list them in `sources/skills.sources.yaml`.
+- Externally authored skills that were forked in once and are no longer tracked upstream live directly under `skills/` as well. Record their author, upstream commit, license, and local modifications in `docs/ATTRIBUTION.md`, and honour any license restriction noted there.
 - Manage third-party skills through `sources/skills.sources.yaml`, `.xan/skills.lock.json`, and `tools/skillctl`.
 - Do not hand-edit third-party snapshot directories under `skills/`. Use `overlays/<skill-name>/overlay.yaml` for small local adaptations, or fork the upstream source for large changes.
 - After changing sources, lockfiles, overlays, tooling, or third-party snapshots, run:

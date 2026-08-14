@@ -14,11 +14,11 @@
 
 | Function | 状态 | 适用范围 | 常见子类 |
 |---|---|---|---|
-| `engineering` | 已启用 | 软件工程、内部工具、自动化脚本、系统集成 | `backend`、`frontend`、`devops`、`security`、`testing`、`code-review`、`cloudflare` |
+| `engineering` | 已启用 | 软件工程、内部工具、自动化脚本、系统集成 | `backend`、`frontend`、`devops`、`security`、`testing`、`code-review`、`cloudflare`、`ai-workflow` |
 | `marketing` | 规划中 | 增长、流量、广告、SEO、活动和转化 | `seo`、`ads`、`email`、`social`、`campaigns` |
 | `ecommerce` | 规划中 | 电商平台、商品内容、销售转化和平台规则 | `amazon`、`listing`、`product-research`、`reviews`、`marketplace-compliance` |
-| `operations` | 已启用 | 业务运营、SOP、供应商、库存、履约、自动化执行 | `sop`、`inventory`、`suppliers`、`fulfillment`、`automation` |
-| `content` | 已启用 | 文案、报告、知识库、脚本、内容资产 | `copywriting`、`blog`、`scripts`、`reports`、`knowledge-base` |
+| `operations` | 已启用 | 业务运营、SOP、供应商、库存、履约、自动化执行 | `sop`、`inventory`、`suppliers`、`fulfillment`、`automation`、`consulting` |
+| `content` | 已启用 | 文案、报告、知识库、脚本、内容资产 | `copywriting`、`blog`、`scripts`、`reports`、`knowledge-base`、`publishing`、`pipeline` |
 | `media` | 已启用 | 图片、视频、视觉提示词、设计资产和创意生产 | `images`、`video`、`video-summary`、`prompts`、`design-review` |
 | `data` | 规划中 | 数据查询、分析、报表、仪表盘和数据库工作流 | `analytics`、`reporting`、`dashboards`、`spreadsheets`、`databases` |
 | `finance` | 规划中 | 定价、利润、预算、对账、现金流 | `pricing`、`profit`、`budgeting`、`reconciliation` |
@@ -31,16 +31,26 @@
 
 来源为「第三方」的 skill 是快照，通过 `sources/skills.sources.yaml` 声明并由 `skillctl` 同步，不要手工修改其目录。
 
+来源为「引入」的 skill 是一次性 fork 进本仓库的外部作品，不由 `skillctl` 跟踪上游，可以直接修改；许可证、原作者和本地改动记录见 [ATTRIBUTION.md](ATTRIBUTION.md)。
+
 | Skill | 路径 | 来源 | 说明 |
 |---|---|---|---|
+| `xan-writer` | `skills/content/blog/xan-writer` | 引入 | 长文写作：把灵感、调研、素材装配成中文长文，含 thread、口播稿和译介 |
+| `xan` | `skills/content/pipeline/xan` | 引入 | 内容路由：判断当前该走哪一步，串联选题到平台草稿的完整链路 |
+| `xan-wechat` | `skills/content/publishing/xan-wechat` | 引入 | 平台投递：中文长文的公众号排版与草稿箱写入 |
+| `xan-x-article` | `skills/content/publishing/xan-x-article` | 引入 | 平台投递：长文与封面写入 X Articles 后台草稿 |
 | `mm-daily-log` | `skills/content/reports/mm-daily-log` | 自有 | 内容报告：从 Mattermost（mm.oazon.com）抓取某天会话，整理成本人的日报草稿，交接 `oazon-daily` 落库 |
 | `oazon-daily` | `skills/content/reports/oazon-daily` | 自有 | 内容报告：Oazon 每日工作日报 |
 | `plain-language-daily-reports` | `skills/content/reports/plain-language-daily-reports` | 自有 | 内容报告：大白话日报、周报和项目进展 |
+| `xan-multimodel` | `skills/engineering/ai-workflow/xan-multimodel` | 引入 | 模型编排：Grok / Claude / Codex 按任务分工、复核、竞赛与实时调研 |
 | `wrangler` | `skills/engineering/cloudflare/wrangler` | 第三方 | Cloudflare：Wrangler CLI 部署与管理 Workers、KV、R2、D1 等资源 |
 | `implementation-impact-brief` | `skills/engineering/code-review/implementation-impact-brief` | 自有 | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
 | `server-docker-compose-standard` | `skills/engineering/devops/server-docker-compose-standard` | 自有 | 运维标准：`/opt/docker` 下一服务一个 Docker Compose 项目的部署规范 |
+| `xan-cover` | `skills/media/images/xan-cover` | 引入 | 封面生成：文章转公众号与 X 平台封面，按目标尺寸分别出图 |
+| `xan-broll` | `skills/media/video/xan-broll` | 引入 | 视频生成：编辑隐喻拼贴风格 B-roll 与 45–60 秒讲解片，需 ffmpeg |
 | `video-summary-service` | `skills/media/video-summary/video-summary-service` | 自有 | 视频处理：调用已部署的 Video Summary 服务对短视频链接做异步摘要 |
 | `clock-in` | `skills/operations/automation/clock-in` | 自有 | 日常运营自动化：钉钉打卡和通知 |
+| `xan-consult` | `skills/operations/consulting/xan-consult` | 引入 | 咨询诊断：企业知识库 / AI 落地的就绪度诊断与方案蓝图 |
 | `lark-shared` | `skills/platforms/lark/lark-shared` | 第三方 | 飞书基座：`lark-cli` 应用配置、登录授权、user/bot 身份切换、scope 排障，其余 lark skill 均引用它 |
 | `lark-doc` | `skills/platforms/lark/lark-doc` | 第三方 | 飞书云文档：Docx / Wiki 读取、创建、编辑、历史版本，素材与画板 |
 | `lark-im` | `skills/platforms/lark/lark-im` | 第三方 | 飞书消息：发送回复、群聊管理、消息搜索、图片文件收发 |
@@ -52,6 +62,7 @@
 | `managing-up` | `skills/productivity/communication/managing-up` | 第三方 | 职场沟通：向上管理，主动沟通、争取资源、用业务视角提出异议 |
 | `professional-communication` | `skills/productivity/communication/professional-communication` | 第三方 | 职场沟通：邮件、团队消息、会议表达的结构化写作与受众调校 |
 | `grill-me` | `skills/productivity/feedback/grill-me` | 第三方 | 方案打磨：用高强度追问审视一份计划或设计 |
+| `xan-obsidian` | `skills/productivity/knowledge-management/xan-obsidian` | 引入 | 知识库搭建：新建或渐进适配面向内容生产的 Obsidian vault |
 | `cangjie-skill` | `skills/productivity/reading/cangjie-skill` | 第三方 | 知识蒸馏：把书籍、长视频、播客、课程拆解成一组可执行 skill |
 | `done` | `skills/productivity/review/done` | 自有 | 复盘沉淀：会话结束时复盘本次+历史会话，产出提问模板、项目记忆、知识短板、跨会话固定流程→建议新 skill，先汇报后拍板 |
 

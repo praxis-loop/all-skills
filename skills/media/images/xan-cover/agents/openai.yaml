@@ -1,0 +1,4 @@
+interface:
+  display_name: "Xan Cover"
+  short_description: "优先用 Image 2 生成图文一体的公众号与 X 编辑封面"
+  default_prompt: "Use $xan-cover to turn this article into integrated WeChat and X cover assets."

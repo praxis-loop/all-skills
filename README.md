@@ -71,6 +71,8 @@ npm install
 
 不要手工修改第三方快照目录。需要本地适配时，优先使用 `overlays/<skill-name>/overlay.yaml`。
 
+一次性 fork 进本仓库、不跟踪上游的外部 skill（来源标为「引入」）不走 `skillctl`，其原作者、许可证和本地改动记录在 [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md)。
+
 ## 修改与发布
 
 ```bash

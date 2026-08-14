@@ -10,3 +10,12 @@
 - `security`：安全检查、权限、密钥、风险排查。
 - `testing`：测试设计、测试补齐、质量验证。
 - `code-review`：代码审查、变更摘要、PR 检查。
+- `cloudflare`：Cloudflare 平台资源部署与管理。
+- `ai-workflow`：多模型分工、Agent 编排与验收。
+
+当前已启用 domain：
+
+- `cloudflare`
+- `code-review`
+- `devops`
+- `ai-workflow`

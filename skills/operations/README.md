@@ -10,6 +10,9 @@
 - `fulfillment`：发货、物流、履约异常处理。
 - `automation`：打卡、通知、巡检、同步等自动化动作。
 
+- `consulting`：诊断、评估、方案蓝图和分期路线图。
+
 当前已启用 domain：
 
 - `automation`
+- `consulting`

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Xan X Article"
+  short_description: "把长文和封面可靠送入 X Articles 草稿箱"
+  default_prompt: "Use $xan-x-article to prepare and verify this X Articles draft. Stop at the draft and never click Publish."

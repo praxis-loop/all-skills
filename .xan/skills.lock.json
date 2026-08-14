@@ -236,8 +236,8 @@
         "treeSha": "97a53977beb2218d27ae04586e79dbc84ebf63be"
       },
       "target": "skills/platforms/lark/lark-sheets",
-      "contentSha256": "sha256:56fa11d735dd3415501be92e5a548b593d4f900137b121da152f57fa0331a00e",
-      "syncedAt": "2026-08-13T16:38:16.445Z",
+      "contentSha256": "sha256:3180b9ac9a311ada4957725c521ec19a32b6a3cdd860ef03199f1092fc55d10e",
+      "syncedAt": "2026-08-14T05:01:10.467Z",
       "riskFlags": [
         "mentions secret-bearing path",
         "contains executable helper scripts"

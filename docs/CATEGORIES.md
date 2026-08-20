@@ -39,6 +39,7 @@
 | `wrangler` | `skills/engineering/cloudflare/wrangler` | 第三方 | Cloudflare：Wrangler CLI 部署与管理 Workers、KV、R2、D1 等资源 |
 | `implementation-impact-brief` | `skills/engineering/code-review/implementation-impact-brief` | 自有 | 工程评审：基于 Git 变更或 AI Agent 实现会话生成技术实现与影响分析简报 |
 | `server-docker-compose-standard` | `skills/engineering/devops/server-docker-compose-standard` | 自有 | 运维标准：`/opt/docker` 下一服务一个 Docker Compose 项目的部署规范 |
+| `server-ops` | `skills/engineering/devops/server-ops` | 自有 | 服务器排查：502/超时/容器异常的定位流程，凭证走 agent-vault，收尾回写服务清单 |
 | `video-summary-service` | `skills/media/video-summary/video-summary-service` | 自有 | 视频处理：调用已部署的 Video Summary 服务对短视频链接做异步摘要 |
 | `clock-in` | `skills/operations/automation/clock-in` | 自有 | 日常运营自动化：钉钉打卡和通知 |
 | `lark-shared` | `skills/platforms/lark/lark-shared` | 第三方 | 飞书基座：`lark-cli` 应用配置、登录授权、user/bot 身份切换、scope 排障，其余 lark skill 均引用它 |

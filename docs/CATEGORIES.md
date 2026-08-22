@@ -25,7 +25,7 @@
 | `legal` | 规划中 | 合同、合规、政策、条款和风险检查 | `contracts`、`compliance`、`policies` |
 | `customer-support` | 规划中 | 售后、工单、评价、退款和客户沟通 | `faq`、`tickets`、`replies`、`refunds` |
 | `productivity` | 已启用 | 个人计划、复盘、习惯、知识整理和效率流程 | `planning`、`review`、`personal-routines`、`knowledge-management`、`collaboration`、`communication`、`feedback`、`reading` |
-| `platforms` | 已启用 | 外部 SaaS / 平台的 API 与 CLI 绑定。同一 domain 下的 skill 共用一套凭据、scope 和安全边界，通常成组 vendored 自厂商仓库 | `lark` |
+| `platforms` | 已启用 | 外部 SaaS / 平台的 API 与 CLI 绑定。同一 domain 下的 skill 共用一套凭据、scope 和安全边界，通常成组 vendored 自厂商仓库 | `lark`、`agent-vault` |
 
 ## 当前 Skill
 
@@ -42,6 +42,7 @@
 | `server-ops` | `skills/engineering/devops/server-ops` | 自有 | 服务器排查：502/超时/容器异常的定位流程，凭证走 agent-vault，收尾回写服务清单 |
 | `video-summary-service` | `skills/media/video-summary/video-summary-service` | 自有 | 视频处理：调用已部署的 Video Summary 服务对短视频链接做异步摘要 |
 | `clock-in` | `skills/operations/automation/clock-in` | 自有 | 日常运营自动化：钉钉打卡和通知 |
+| `agent-vault-shared` | `skills/platforms/agent-vault/agent-vault-shared` | 自有 | 凭证基座：agent-vault CLI 安装与校验、权限自查、取凭证的标准姿势（ssh-add - / GIT_ASKPASS）、缺权限走 proposal、收尾清理。所有声明 x-vault-* 的 skill 都引用它 |
 | `lark-shared` | `skills/platforms/lark/lark-shared` | 第三方 | 飞书基座：`lark-cli` 应用配置、登录授权、user/bot 身份切换、scope 排障，其余 lark skill 均引用它 |
 | `lark-doc` | `skills/platforms/lark/lark-doc` | 第三方 | 飞书云文档：Docx / Wiki 读取、创建、编辑、历史版本，素材与画板 |
 | `lark-im` | `skills/platforms/lark/lark-im` | 第三方 | 飞书消息：发送回复、群聊管理、消息搜索、图片文件收发 |

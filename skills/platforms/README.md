@@ -35,3 +35,4 @@ skills/platforms/<platform>/<skill-name>/
 ## 当前已启用 domain
 
 - `lark`：飞书 / Lark，见 [lark/README.md](lark/README.md)
+- `agent-vault`：凭证保管与分发。所有需要凭证的 skill 共用它的 CLI、授权链路和安全边界

@@ -41,6 +41,18 @@ Do not overwrite a target CLI skill directory when the existing target is a real
 - Do not commit secrets, tokens, passwords, private keys, or machine-specific local config.
 - Ask for confirmation before deleting data, publishing changes, sending messages, spending money, or changing production systems.
 
+## Credentials
+
+Any skill that needs a secret (API token, SSH private key, git auth) must reference the base skill
+`skills/platforms/agent-vault/agent-vault-shared` rather than describing its own credential handling.
+Declare which vaults it needs in frontmatter (`x-vault-identity`, `x-vault-services`) and let the base
+skill own installation, retrieval, and cleanup.
+
+Those `x-vault-*` fields are a **list of vaults to try, not a grant**. Runtime authorization is whatever
+`agent-vault vault discover --vault <name>` returns — nothing else.
+
+Never write a credential into a skill file, a script, or an example command. Placeholders only.
+
 ## Third-party Skill Supply Chain
 
 - Keep the filesystem as the source of truth for approved runtime skills. Do not restore `registry.json`.

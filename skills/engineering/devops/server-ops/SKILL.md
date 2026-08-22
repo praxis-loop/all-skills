@@ -39,9 +39,12 @@ git log -1 --date=short --format='%h %ad %s'
 
 remote 对不上就停下报告，**不要在陌生仓库里干活**。
 
-> `x-*` 字段是**路牌，不是权限声明**。没有任何程序会执行它们。运行时权限的唯一真相是
-> `agent-vault vault discover`（返回实际授权），不是 frontmatter。`x-vault-services` 只是
-> 配置检查单——把本 skill 分配给某个 agent 时，人对照它确认该 agent 是否已加入这些 vault。
+> `x-*` 字段是**待试清单，不是权限声明**。没有任何程序会执行它们。运行时权限的唯一真相是
+> `agent-vault vault discover --vault <名>`（返回实际授权），不是 frontmatter。
+
+**凭证相关的一切走基座 skill `platforms/agent-vault/agent-vault-shared`**——CLI 安装、权限自查、
+取凭证的标准姿势、缺权限怎么申请、收尾清理，都在那里写了一份，本文不重复。开工前先完成它的
+第 0 步前置检查。
 
 清单的时效性直接决定排查质量：`README.md` 里通常写着「最后核实：<日期>」。如果距今很久，把「清单可能过期」作为默认假设，别把它当权威。
 

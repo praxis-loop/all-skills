@@ -126,9 +126,25 @@ ssh-agent -k
 
 **绝不** `agent-vault ... > key.pem`。私钥不落盘。
 
-#### 3.3 git 认证 —— 走 `GIT_ASKPASS`
+#### 3.3 git 提交身份
 
-git 需要密码时才调脚本，脚本现取现给，token 不进 `.git/config`、不进环境变量、不进进程列表：
+**每次在仓库里工作前先设身份**，否则提交会挂在 daemon 机器的默认身份上，分不清是哪个 agent 干的：
+
+```bash
+git config user.name  "$(agent-vault vault credential get GIT_AUTHOR_NAME  --vault "$AGENT_IDENTITY_VAULT")"
+git config user.email "$(agent-vault vault credential get GIT_AUTHOR_EMAIL --vault "$AGENT_IDENTITY_VAULT")"
+git config user.email     # 确认设上了再干活
+```
+
+约定：**name 统一 `RichXan`，email 按 agent 区分**（`x-backend@xan`、`x-devops@xan` …）。
+
+这个 email 与该 agent 的 SSH 公钥注释是同一个字符串，所以**同一个 agent 在服务器的 `auth.log` 和仓库的 `git log` 里长得一样**，两端能对上。
+
+只设 `--local`（不带 `--global`）——托管 workdir 用完即弃，不要污染机器级配置。
+
+#### 3.4 git 推送认证 —— 走 `GIT_ASKPASS`
+
+git 需要密码时才调脚本，脚本现取现给。**token 不进 `.git/config`、不进环境变量、不进进程列表**：
 
 ```bash
 ASKPASS=$(mktemp)
@@ -142,13 +158,43 @@ EOF
 chmod 700 "$ASKPASS"
 
 GIT_ASKPASS="$ASKPASS" GIT_TERMINAL_PROMPT=0 \
-  GIT_VAULT_USER=<用户名> GIT_VAULT_KEY=<凭证键名> GIT_VAULT_NAME=<vault 名> \
+  GIT_VAULT_USER=agent GIT_VAULT_KEY=<凭证键名> GIT_VAULT_NAME="$AGENT_IDENTITY_VAULT" \
   git push origin HEAD
 
 rm -f "$ASKPASS"
 ```
 
-⛔ **禁止**把 token 拼进 URL（`https://user:TOKEN@host/...`）。那会把 token 写进 `.git/config`，而 `git remote -v` 会直接把它打印出来。
+⛔ **禁止**把 token 拼进 URL（`https://user:TOKEN@host/…`）。那会把 token 写进 `.git/config`，而 `git remote -v` 会直接打印出来。
+
+##### 读走 SSH、写走 HTTPS
+
+daemon 用 **SSH URL** clone（那是机器身份），而 PAT 只能走 **HTTPS**。所以推送要单独指定 push URL：
+
+```bash
+git remote set-url --push origin <HTTPS 地址>
+```
+
+**SSH → HTTPS 的地址换算因平台而异，不能靠猜：**
+
+| 平台 | clone 用的 SSH URL | 推送用的 HTTPS URL |
+|---|---|---|
+| GitHub | `git@github.com:<org>/<repo>.git` | `https://github.com/<org>/<repo>.git` |
+| Azure DevOps | `git@ssh.dev.azure.com:v3/<org>/<project>/<repo>` | `https://dev.azure.com/<org>/<project>/_git/<repo>` |
+
+> ⚠️ Azure DevOps 两者**结构不同**，不是简单换协议：SSH 是 `v3/org/project/repo`，HTTPS 要插一段 `_git`。照着 SSH 地址直接换协议会得到一个 404。
+
+凭证键名按平台区分，各存在本 agent 的 `$AGENT_IDENTITY_VAULT` 里：
+
+| 平台 | 键名 |
+|---|---|
+| GitHub | `GITHUB_PAT` |
+| Azure DevOps | `AZDO_PAT` |
+
+**推完立即恢复，不要把 pushurl 留在配置里：**
+
+```bash
+git remote set-url --delete --push origin <HTTPS 地址> 2>/dev/null || true
+```
 
 ### 4. 缺权限时
 

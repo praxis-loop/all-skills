@@ -63,3 +63,19 @@ AGENT_IDENTITY_VAULT  本 agent 专属身份 vault 名
 ```
 
 **per-agent 的东西一律放进它自己的身份 vault，不要增加环境变量。** 这样新增一个 agent 只需建一个 vault，平台侧配置形状永远不变——换平台时要搬的也只有 vault。
+
+## 身份 vault 装什么
+
+`identity-<agent>` 是该 agent 的全部个人身份，约定键名如下：
+
+| 键 | 内容 |
+|---|---|
+| `SSH_PRIVATE_KEY` / `SSH_PUBLIC_KEY` | 该 agent 专属的 ed25519 密钥对，注释为 `<agent>@xan` |
+| `GIT_AUTHOR_NAME` | 统一为 `RichXan` |
+| `GIT_AUTHOR_EMAIL` | 按 agent 区分，`<agent>@xan` |
+| `GITHUB_PAT` | GitHub 推送用（按需） |
+| `AZDO_PAT` | Azure DevOps 推送用（按需） |
+
+`GIT_AUTHOR_EMAIL` 与 SSH 公钥注释**是同一个字符串**——所以同一个 agent 在服务器 `auth.log` 与仓库 `git log` 里长得一样，两端可对上。
+
+新增 agent 时照这张表建齐，`custom_env` 那三个变量不变。

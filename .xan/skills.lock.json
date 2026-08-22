@@ -139,12 +139,12 @@
         "value": "main"
       },
       "resolved": {
-        "commit": "a8552d7f447df0b6c901a70a4dde463aef43f521",
-        "treeSha": "8cc6c78c32b505ea345fb164e2a99a9e4f00ab69"
+        "commit": "423e81fcc666c721f27c22be53086739d87d0f3e",
+        "treeSha": "7f23674057e1a352dbed6c300a19fc3a7cc4167f"
       },
       "target": "skills/platforms/lark/lark-base",
-      "contentSha256": "sha256:306855527c1eb7804ea20446cb52ed6a203902fdd4c6e4fb1136f569693b393f",
-      "syncedAt": "2026-08-13T16:22:42.840Z",
+      "contentSha256": "sha256:6c5a7b674ce579d7f3594d7feb60f5144a58eb9fe6a2677432718e42f02db4db",
+      "syncedAt": "2026-08-22T16:03:20.154Z",
       "riskFlags": [
         "mentions secret-bearing path"
       ]

@@ -194,12 +194,22 @@ git remote set-url --push origin <HTTPS 地址>
 
 > ⚠️ Azure DevOps 两者**结构不同**，不是简单换协议：SSH 是 `v3/org/project/repo`，HTTPS 要插一段 `_git`。照着 SSH 地址直接换协议会得到一个 404。
 
-凭证键名按平台区分，各存在本 agent 的 `$AGENT_IDENTITY_VAULT` 里：
+凭证键名与所在 vault 按平台区分——**注意两者不在同一个 vault**：
 
-| 平台 | 键名 |
-|---|---|
-| GitHub | `GITHUB_PAT` |
-| Azure DevOps | `AZDO_PAT` |
+| 平台 | 键名 | vault | 说明 |
+|---|---|---|---|
+| GitHub | `GH_TOKEN` | `vcs`（共享） | |
+| Azure DevOps | `AZDO_PAT` | `vcs`（共享） | 组织地址另见同 vault 的 `AZDO_ORG_URL` |
+
+```bash
+GIT_VAULT_USER=agent GIT_VAULT_KEY=AZDO_PAT GIT_VAULT_NAME=vcs
+```
+
+> **推送凭证是共享的，提交身份不是。** 谁推的由 PAT 决定（同一个 Azure 账号），**谁写的由 `user.email` 决定**（每个 agent 不同，见 3.3）。归因看 commit author，不看推送者。
+>
+> 因此**第 3.3 步不能省**——省了的话所有 agent 的提交会长得一模一样，归因就没了。
+
+⚠️ **默认分支是 `master` 不是 `main`**（`nauth` / `nauth-web` 均如此，已实测）。不要想当然。
 
 **推完立即恢复，不要把 pushurl 留在配置里：**
 

@@ -73,8 +73,8 @@ AGENT_IDENTITY_VAULT  本 agent 专属身份 vault 名
 | `SSH_PRIVATE_KEY` / `SSH_PUBLIC_KEY` | 该 agent 专属的 ed25519 密钥对，注释为 `<agent>@xan` |
 | `GIT_AUTHOR_NAME` | 统一为 `RichXan` |
 | `GIT_AUTHOR_EMAIL` | 按 agent 区分，`<agent>@xan` |
-| `GITHUB_PAT` | GitHub 推送用（按需） |
-| `AZDO_PAT` | Azure DevOps 推送用（按需） |
+
+**推送用的 PAT 不在这里，在共享的 `vcs` vault**（`GH_TOKEN` / `AZDO_PAT` / `AZDO_ORG_URL`）——那是"能不能推"，属于平台凭证；身份 vault 装的是"你是谁"。
 
 `GIT_AUTHOR_EMAIL` 与 SSH 公钥注释**是同一个字符串**——所以同一个 agent 在服务器 `auth.log` 与仓库 `git log` 里长得一样，两端可对上。
 

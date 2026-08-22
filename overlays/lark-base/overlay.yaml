@@ -1,10 +1,10 @@
 # 本地改造：注入 lark-cli 前置检查。
+#
+# 锚点前后带换行，两个原因：
+#   1. 上游 v1.2.18 把 H1 从 "# base" 改成了 "# Base"；
+#   2. 文中还有 "## Base Block 资源模型"，而 applyOverlay 用 split/join 全量替换，
+#      裸写 "# Base" 会命中两处、注入两遍。
 replace:
   - file: SKILL.md
-    from: "# base"
-    to: |-
-      # base
-
-      > **前置检查（本地追加）**：首次执行 lark-cli 前先跑
-      > `command -v lark-cli >/dev/null || { echo '缺少 lark-cli，先执行：npx @larksuite/cli@latest install'; exit 1; }`
-      > 未安装时直接把安装命令给用户，不要自行猜测安装方式。
+    from: "\n# Base\n"
+    to: "\n# Base\n\n> **前置检查（本地追加）**：首次执行 lark-cli 前先跑\n> `command -v lark-cli >/dev/null || { echo '缺少 lark-cli，先执行：npx @larksuite/cli@latest install'; exit 1; }`\n> 未安装时直接把安装命令给用户，不要自行猜测安装方式。\n"

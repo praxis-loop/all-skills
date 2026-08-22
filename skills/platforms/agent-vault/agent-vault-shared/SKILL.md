@@ -27,6 +27,8 @@ compatibility: 需要 agent-vault CLI（外部二进制，不入库；缺失时�
 ### 0. 前置检查（每次都要做，不许跳过）
 
 ```bash
+export PATH="$HOME/.local/bin:$PATH"      # 见下方说明，这行不能省
+
 command -v agent-vault >/dev/null || { echo "MISSING: agent-vault CLI"; }
 : "${AGENT_VAULT_ADDR:?MISSING: AGENT_VAULT_ADDR}"
 : "${AGENT_VAULT_TOKEN:?MISSING: AGENT_VAULT_TOKEN}"
@@ -35,6 +37,11 @@ command -v agent-vault >/dev/null || { echo "MISSING: agent-vault CLI"; }
 
 **CLI 缺失** → 按第 1 步安装。
 **环境变量缺失** → **立即停止**，在任务里回帖说明缺哪个变量，转等待人工配置。
+
+> ⚠️ **第一行 `export PATH` 是必须的，别当成可选的保险。**
+> CLI 装在 `~/.local/bin`，但**平台无法把 `PATH` 注入给你**——multica 的 `custom_env` 把 `PATH` 列为屏蔽键（`daemon.go` `isBlockedEnvKey`），HOME / USER / SHELL / TMPDIR 同理。
+> 少了这行，会出现「装完了，下一条 `command -v` 还是说缺」的死循环：每次都重装、每次都找不到。
+> **每个新 shell 会话都要重新 export**，它不会自己留下来。
 
 > ⛔ **禁止绕路。** 不许把凭证写死在代码或命令里，不许改用别的账号或入口，不许"先跳过这步继续做别的然后当作完成"。缺凭证就是做不了，如实说做不了。
 
@@ -55,8 +62,12 @@ grep " ${TGZ}\$" checksums.txt | sha256sum -c - || { echo "校验失败，终止
 
 tar -xzf "$TGZ" agent-vault && install -m 0755 agent-vault ~/.local/bin/agent-vault
 export PATH="$HOME/.local/bin:$PATH"
-agent-vault version
+agent-vault version                      # 必须能跑通再往下，否则回到第 0 步看 PATH
 ```
+
+**装完立刻验证一次**。若 `agent-vault version` 报 `command not found`，问题是 PATH 不是安装——`ls -l ~/.local/bin/agent-vault` 确认文件在，然后回第 0 步。**不要重复下载。**
+
+首次安装会下 ~13 MB。若下载失败或极慢，**不要重试第三次**——直接回帖说明该 runtime 到 `github.com` / `objects.githubusercontent.com` 的连通性有问题，转人工。这类网络问题 agent 解决不了，反复重试只会耗光任务时间。
 
 已知校验和（v0.39.1，官方 `checksums.txt`）：
 
